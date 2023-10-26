@@ -6,10 +6,40 @@ using Microsoft.Extensions.Configuration;
 using MySqlConnector;
 using System;
 using System.Reflection;
+using Microsoft.AspNetCore.Authorization;
+using AI2_Backend.Services;
+using AI2_Backend.Settings;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using AI2_Backend.Models;
+using AI2_Backend.Models.Validators;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// database connection
+// authentication
+var authenticationSettings = new AuthenticationSettings();
+builder.Configuration.GetSection("Authentication").Bind(authenticationSettings);
+
+builder.Services.AddSingleton(authenticationSettings);
+
+builder.Services.AddAuthentication(option =>
+{
+    option.DefaultAuthenticateScheme = "Bearer";
+    option.DefaultScheme = "Bearer";
+    option.DefaultChallengeScheme = "Bearer";
+}).AddJwtBearer(cfg =>
+{
+    cfg.RequireHttpsMetadata = false;           
+    cfg.SaveToken = true;
+    cfg.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        ValidIssuer = authenticationSettings.JwtIssuer,
+        ValidAudience = authenticationSettings.JwtIssuer, 
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authenticationSettings.JwtKey))  
+    };
+});
+
 
 // Add services to the container.
 
@@ -29,8 +59,14 @@ builder.Services.AddDbContextPool<AIDbContext>(options =>
 });
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
+builder.Services.AddScoped<IUserContextService, UserContextService>();
 builder.Services.AddHttpContextAccessor();
 
+// services
+builder.Services.AddScoped<IAccountService, AccountService>();
+
+// validators
+builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 
 var app = builder.Build();
 

@@ -15,6 +15,11 @@ namespace AI2_Backend.Entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<User>()
+                .Property(e => e.Email)
+                .IsRequired()
+                .HasMaxLength(255);
         }
 
    

@@ -24,9 +24,6 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
-    <Folder Include="Models\" />
-    <Folder Include="Nowy folder\" />
-    <Folder Include="Services\" />
     <Folder Include="Seeders\" />
   </ItemGroup>
 
