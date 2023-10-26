@@ -22,5 +22,20 @@ namespace AI2_Backend.Controllers
 
             return Ok();
         }
+
+        [HttpPost("login")]
+        public ActionResult LoginUser([FromBody] LoginUserDto dto)
+        {
+            try
+            {
+                string token = _accountService.GenerateJwt(dto);
+
+                return Ok(token);
+            } catch(Exception ex)
+            {
+                return Unauthorized("Niepoprawne dane logowawnia.");
+            }
+            
+        }
     }
 }
