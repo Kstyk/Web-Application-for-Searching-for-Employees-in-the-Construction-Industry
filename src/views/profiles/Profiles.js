@@ -70,7 +70,7 @@ const Profiles = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-semibold mb-4">Profiles</h1>
+      <h1 className="text-2xl font-semibold mb-4">Profile pracowników</h1>
       <div className="flex space-x-2 mb-4">
         <TextField
           label="Szukaj"

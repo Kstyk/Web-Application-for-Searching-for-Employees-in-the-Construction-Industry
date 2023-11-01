@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Avatar,
   Button,
@@ -8,7 +8,6 @@ import {
   CardHeader,
   IconButton,
   Typography,
-  Link,
   Modal,
   Box
 } from '@mui/material';
@@ -48,8 +47,8 @@ const Profile = () => {
 
   const isFavorite = (profileId) => favoriteProfiles.has(profileId);
 
-  const lastDayLogins = 10; 
-  const lastMonthLogins = 100; 
+  const lastDayLogins = 10;
+  const lastMonthLogins = 100;
 
   const handleAddToFavorites = () => {
 
@@ -131,14 +130,16 @@ const Profile = () => {
           </ul>
         </CardContent>
         <div className="flex justify-end p-4">
-          <Button
-            startIcon={<MailOutline />}
-            onClick={handleSendEmail}
-            variant="contained"
-            color="primary"
-          >
-            Wyślij maila
-          </Button>
+          <Link to={`/mail_send/${id}`}>
+            <Button
+              startIcon={<MailOutline />}
+              onClick={handleSendEmail}
+              variant="contained"
+              color="primary"
+            >
+              Wyślij maila
+            </Button>
+          </Link>
         </div>
       </Card>
       <Modal open={deleteModalOpen} onClose={handleCloseDeleteModal}>

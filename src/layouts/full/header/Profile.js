@@ -78,7 +78,7 @@ const Profile = () => {
           </ListItemIcon>
           <ListItemText>Zapisane profile</ListItemText>
         </MenuItem>
-        <MenuItem>
+        <MenuItem component={Link} to="/mail_history">
           <ListItemIcon>
             <IconListCheck width={20} />
           </ListItemIcon>
