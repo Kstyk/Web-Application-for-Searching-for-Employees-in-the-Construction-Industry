@@ -87,6 +87,21 @@ namespace AI2_Backend.Services
                 throw new Exception();
             }
 
+            if (updateUserDto.QualificationsToAdd != null)
+            {
+                _context.UserQualifications.Where(q => q.UserId == user.Id).ExecuteDelete();
+
+                var qualificationsToAdd = _context.Qualifications
+                    .Where(q => updateUserDto.QualificationsToAdd.Contains(q.Id))
+                    .ToList();
+
+                foreach (var qualification in qualificationsToAdd)
+                {
+                    Console.WriteLine(qualification.Name);
+                    user.UserQualifications.Add(new UserQualification { UserId = user.Id, QualificationId = qualification.Id });
+                }
+            }
+
             var updateUser = _mapper.Map<UpdateUserDto, User>(updateUserDto, user);
 
             _context.Users.Update(updateUser);

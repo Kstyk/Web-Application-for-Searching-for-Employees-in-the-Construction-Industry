@@ -10,5 +10,7 @@ namespace AI2_Backend.Models
         public string? Education { get; set; }
         public Voivodeship? Voivodeship { get; set; }
         public decimal? RequiredPayment { get; set; }
+        public List<int>? QualificationsToAdd { get; set; } // Id branż do dodania
+
     }
 }

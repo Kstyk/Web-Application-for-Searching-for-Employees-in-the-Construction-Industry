@@ -9,13 +9,13 @@ namespace AI2_Backend.Entities
         public virtual Role Role { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
         public string? AboutMe { get; set; }
         public string? Education { get; set; }
         public Voivodeship? Voivodeship { get; set; }
         public decimal? RequiredPayment { get; set; }
-        public ICollection<UserQualification> UserQualifications { get; set; }
+        public ICollection<UserQualification> UserQualifications { get; set; } = new List<UserQualification>();
 
         public User()
         {

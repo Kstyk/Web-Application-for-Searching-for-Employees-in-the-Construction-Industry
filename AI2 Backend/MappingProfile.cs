@@ -9,7 +9,8 @@ namespace AI2_Backend
         public MappingProfile()
         {
             CreateMap<RegisterUserDto, User>();
-            CreateMap<UpdateUserDto, User>();
+            CreateMap<UpdateUserDto, User>()
+                .ForMember(dest => dest.UserQualifications, opt => opt.Ignore());
         }
     }
 }
