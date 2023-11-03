@@ -1,5 +1,6 @@
 ﻿using AI2_Backend.Models;
 using AI2_Backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AI2_Backend.Controllers
@@ -35,7 +36,20 @@ namespace AI2_Backend.Controllers
             {
                 return Unauthorized("Niepoprawne dane logowawnia.");
             }
-            
+        }
+
+        [HttpPut("update")]
+        [Authorize]
+        public ActionResult UpdateUser([FromBody] UpdateUserDto dto) {
+            try
+            {
+                _accountService.UpdateUser(dto);
+
+                return Ok();
+            } catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

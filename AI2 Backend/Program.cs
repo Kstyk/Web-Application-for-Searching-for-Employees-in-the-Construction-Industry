@@ -15,6 +15,7 @@ using AI2_Backend.Models;
 using AI2_Backend.Models.Validators;
 using FluentValidation;
 using AI2_Backend.Seeders;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,7 +45,10 @@ builder.Services.AddAuthentication(option =>
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(opt =>
+{
+    opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -71,6 +75,8 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 
 // validators
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdateUserDto>, UpdateUserDtoValidator>();
+builder.Services.AddScoped<IValidator<LoginUserDto>, LoginUserDtoValidator>();
 
 var app = builder.Build();
 

@@ -9,6 +9,7 @@ namespace AI2_Backend
         public MappingProfile()
         {
             CreateMap<RegisterUserDto, User>();
+            CreateMap<UpdateUserDto, User>();
         }
     }
 }

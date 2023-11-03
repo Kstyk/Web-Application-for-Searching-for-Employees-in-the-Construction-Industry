@@ -6,5 +6,6 @@ namespace AI2_Backend.Services
     {
         void RegisterUser(RegisterUserDto dto);
         string GenerateJwt(LoginUserDto loginUserDto);
+        void UpdateUser(UpdateUserDto updateUserDto);
     }
 }

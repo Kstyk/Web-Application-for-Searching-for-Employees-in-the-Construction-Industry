@@ -13,6 +13,8 @@ namespace AI2_Backend.Services
 
         public ClaimsPrincipal? User => _contextAccessor.HttpContext?.User;
 
+        public int? GetUserId => User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier) is null || User is null ? null : int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value);
+
     }
 }
 

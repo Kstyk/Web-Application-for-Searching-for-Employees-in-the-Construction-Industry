@@ -43,9 +43,6 @@ namespace AI2_Backend.Entities
                 .Property(e => e.Education)
                 .HasColumnType("text")
                 .HasMaxLength(10000);
-            modelBuilder.Entity<User>()
-                .Property(e => e.RequiredPayment)
-                .HasPrecision(2);
 
         }
 

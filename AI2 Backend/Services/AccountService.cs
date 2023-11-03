@@ -59,7 +59,9 @@ namespace AI2_Backend.Services
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim("Id", $"{user.Id}"),
                 new Claim("Email", $"{user.Email}"),
-                
+                new Claim("FirstName", $"{user.FirstName}"),
+                new Claim("LastName", $"{user.LastName}"),
+
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.JwtKey));
@@ -73,6 +75,22 @@ namespace AI2_Backend.Services
 
 
             return tokenHandler.WriteToken(token);
+        }
+
+        public void UpdateUser(UpdateUserDto updateUserDto)
+        {
+            var userId = _userContextService.GetUserId;
+            var user = _context.Users.FirstOrDefault(u => u.Id == userId);
+
+            if (user is null)
+            {
+                throw new Exception();
+            }
+
+            var updateUser = _mapper.Map<UpdateUserDto, User>(updateUserDto, user);
+
+            _context.Users.Update(updateUser);
+            _context.SaveChanges();
         }
     }
 }
