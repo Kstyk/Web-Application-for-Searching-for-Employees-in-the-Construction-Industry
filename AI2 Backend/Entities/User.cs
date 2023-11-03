@@ -15,6 +15,7 @@ namespace AI2_Backend.Entities
         public string? Education { get; set; }
         public Voivodeship? Voivodeship { get; set; }
         public decimal? RequiredPayment { get; set; }
+        public ICollection<UserQualification> UserQualifications { get; set; }
 
         public User()
         {

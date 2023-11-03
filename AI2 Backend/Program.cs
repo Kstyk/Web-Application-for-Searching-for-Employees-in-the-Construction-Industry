@@ -16,6 +16,7 @@ using AI2_Backend.Models.Validators;
 using FluentValidation;
 using AI2_Backend.Seeders;
 using System.Text.Json.Serialization;
+using AI2_Backend.seeders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,6 +70,7 @@ builder.Services.AddHttpContextAccessor();
 
 // seeders
 builder.Services.AddScoped<RoleSeeder>();
+builder.Services.AddScoped<QualificationSeeder>();
 
 // services
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -83,8 +85,10 @@ var app = builder.Build();
 // seeders
 var scope = app.Services.CreateScope();
 var roleSeeder = scope.ServiceProvider.GetRequiredService<RoleSeeder>();
+var qualificationSeeder = scope.ServiceProvider.GetRequiredService<QualificationSeeder>();
 
 roleSeeder.Seed();
+qualificationSeeder.Seed();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

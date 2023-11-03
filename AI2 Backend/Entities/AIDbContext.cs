@@ -12,6 +12,8 @@ namespace AI2_Backend.Entities
 
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Qualification> Qualifications{ get; set; }
+        public DbSet<UserQualification> UserQualifications{ get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -44,6 +46,19 @@ namespace AI2_Backend.Entities
                 .HasColumnType("text")
                 .HasMaxLength(10000);
 
+
+            modelBuilder.Entity<UserQualification>()
+                .HasKey(uq => new { uq.UserId, uq.QualificationId });
+
+            modelBuilder.Entity<UserQualification>()
+                .HasOne(uq => uq.User)
+                .WithMany(u => u.UserQualifications)
+                .HasForeignKey(uq => uq.UserId);
+
+            modelBuilder.Entity<UserQualification>()
+                .HasOne(uq => uq.Qualification)
+                .WithMany(q => q.UserQualifications)
+                .HasForeignKey(uq => uq.QualificationId);
         }
 
 
