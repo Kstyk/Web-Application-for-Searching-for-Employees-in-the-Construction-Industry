@@ -14,6 +14,7 @@ using System.Text;
 using AI2_Backend.Models;
 using AI2_Backend.Models.Validators;
 using FluentValidation;
+using AI2_Backend.Seeders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,6 +63,9 @@ builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IUserContextService, UserContextService>();
 builder.Services.AddHttpContextAccessor();
 
+// seeders
+builder.Services.AddScoped<RoleSeeder>();
+
 // services
 builder.Services.AddScoped<IAccountService, AccountService>();
 
@@ -69,6 +73,12 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 
 var app = builder.Build();
+
+// seeders
+var scope = app.Services.CreateScope();
+var roleSeeder = scope.ServiceProvider.GetRequiredService<RoleSeeder>();
+
+roleSeeder.Seed();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

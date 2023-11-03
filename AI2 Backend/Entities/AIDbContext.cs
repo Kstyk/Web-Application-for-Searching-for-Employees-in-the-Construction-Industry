@@ -6,10 +6,11 @@ namespace AI2_Backend.Entities
     {
         public AIDbContext(DbContextOptions<AIDbContext> options) : base(options)
         {
-            
-            
+
+
         }
 
+        public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -22,6 +23,6 @@ namespace AI2_Backend.Entities
                 .HasMaxLength(255);
         }
 
-   
+
     }
 }
