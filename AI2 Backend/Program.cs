@@ -74,6 +74,7 @@ builder.Services.AddScoped<QualificationSeeder>();
 
 // services
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IQualificationService, QualificationService>();
 
 // validators
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();

@@ -97,7 +97,6 @@ namespace AI2_Backend.Services
 
                 foreach (var qualification in qualificationsToAdd)
                 {
-                    Console.WriteLine(qualification.Name);
                     user.UserQualifications.Add(new UserQualification { UserId = user.Id, QualificationId = qualification.Id });
                 }
             }
