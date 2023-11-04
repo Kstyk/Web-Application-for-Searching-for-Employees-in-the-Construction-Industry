@@ -74,6 +74,7 @@ builder.Services.AddScoped<QualificationSeeder>();
 
 // services
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IQualificationService, QualificationService>();
 
 // validators

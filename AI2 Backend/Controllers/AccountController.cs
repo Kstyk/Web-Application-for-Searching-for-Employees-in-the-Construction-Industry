@@ -51,5 +51,14 @@ namespace AI2_Backend.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("my-profile")]
+        [Authorize]
+        public ActionResult<UserProfileDto> GetUserProfile()
+        {
+            var userProfile = _accountService.GetLoggedUserProfile();
+
+            return Ok(userProfile);
+        }
     }
 }

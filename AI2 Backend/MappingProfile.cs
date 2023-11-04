@@ -13,6 +13,11 @@ namespace AI2_Backend
                 .ForMember(dest => dest.UserQualifications, opt => opt.Ignore());
 
             CreateMap<Qualification, QualificationDto>();
+            CreateMap<UserQualification, QualificationDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.QualificationId))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Qualification.Name));
+
+            CreateMap<User, UserProfileDto>();
         }
     }
 }

@@ -106,5 +106,18 @@ namespace AI2_Backend.Services
             _context.Users.Update(updateUser);
             _context.SaveChanges();
         }
+
+        public UserProfileDto GetLoggedUserProfile()
+        {
+            var userId = _userContextService.GetUserId;
+
+            var userProfile = _mapper.Map<UserProfileDto>(_context.Users
+                .Include(q => q.UserQualifications).ThenInclude(u => u.Qualification)
+                .FirstOrDefault(u => u.Id == userId));
+
+            return userProfile;
+        }
+
+
     }
 }
