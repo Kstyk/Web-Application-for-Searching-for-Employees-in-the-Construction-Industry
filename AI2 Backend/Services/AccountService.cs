@@ -87,10 +87,37 @@ namespace AI2_Backend.Services
                 throw new Exception();
             }
 
+            if (updateUserDto.QualificationsToAdd != null)
+            {
+                _context.UserQualifications.Where(q => q.UserId == user.Id).ExecuteDelete();
+
+                var qualificationsToAdd = _context.Qualifications
+                    .Where(q => updateUserDto.QualificationsToAdd.Contains(q.Id))
+                    .ToList();
+
+                foreach (var qualification in qualificationsToAdd)
+                {
+                    user.UserQualifications.Add(new UserQualification { UserId = user.Id, QualificationId = qualification.Id });
+                }
+            }
+
             var updateUser = _mapper.Map<UpdateUserDto, User>(updateUserDto, user);
 
             _context.Users.Update(updateUser);
             _context.SaveChanges();
         }
+
+        public UserProfileDto GetLoggedUserProfile()
+        {
+            var userId = _userContextService.GetUserId;
+
+            var userProfile = _mapper.Map<UserProfileDto>(_context.Users
+                .Include(q => q.UserQualifications).ThenInclude(u => u.Qualification)
+                .FirstOrDefault(u => u.Id == userId));
+
+            return userProfile;
+        }
+
+
     }
 }
