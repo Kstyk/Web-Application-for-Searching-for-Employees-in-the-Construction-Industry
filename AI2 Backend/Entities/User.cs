@@ -16,6 +16,7 @@ namespace AI2_Backend.Entities
         public Voivodeship? Voivodeship { get; set; }
         public decimal? RequiredPayment { get; set; }
         public ICollection<UserQualification> UserQualifications { get; set; } = new List<UserQualification>();
+        public UserPreferences? UserPreferences { get; set; }
 
         public User()
         {

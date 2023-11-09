@@ -14,6 +14,9 @@ namespace AI2_Backend.Entities
         public DbSet<User> Users { get; set; }
         public DbSet<Qualification> Qualifications{ get; set; }
         public DbSet<UserQualification> UserQualifications{ get; set; }
+        public DbSet<Stats> Stats { get; set; }
+        public DbSet<SavedProfile> SavedProfiles { get; set; }
+        public DbSet<UserPreferences> UserPreferences { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -57,6 +60,12 @@ namespace AI2_Backend.Entities
                 .HasOne(uq => uq.Qualification)
                 .WithMany(q => q.UserQualifications)
                 .HasForeignKey(uq => uq.QualificationId);
+
+            modelBuilder.Entity<UserPreferences>()
+                .HasOne(e => e.Employee)
+                .WithOne(e => e.UserPreferences)
+                .HasForeignKey<UserPreferences>(e => e.EmployeeId)
+                .IsRequired();
         }
 
 

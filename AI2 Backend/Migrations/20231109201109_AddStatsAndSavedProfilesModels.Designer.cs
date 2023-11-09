@@ -3,6 +3,7 @@ using System;
 using AI2_Backend.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AI2_Backend.Migrations
 {
     [DbContext(typeof(AIDbContext))]
-    partial class AIDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231109201109_AddStatsAndSavedProfilesModels")]
+    partial class AddStatsAndSavedProfilesModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -139,44 +142,6 @@ namespace AI2_Backend.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("AI2_Backend.Entities.UserPreferences", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsVisibleAboutMe")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("IsVisibleEducation")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("IsVisibleExperience")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("IsVisibleProfile")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("IsVisibleRequiredPayment")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("IsVisibleSkills")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("IsVisibleVoivodeship")
-                        .HasColumnType("tinyint(1)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId")
-                        .IsUnique();
-
-                    b.ToTable("UserPreferences");
-                });
-
             modelBuilder.Entity("AI2_Backend.Entities.UserQualification", b =>
                 {
                     b.Property<int>("UserId")
@@ -233,17 +198,6 @@ namespace AI2_Backend.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("AI2_Backend.Entities.UserPreferences", b =>
-                {
-                    b.HasOne("AI2_Backend.Entities.User", "Employee")
-                        .WithOne("UserPreferences")
-                        .HasForeignKey("AI2_Backend.Entities.UserPreferences", "EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
-                });
-
             modelBuilder.Entity("AI2_Backend.Entities.UserQualification", b =>
                 {
                     b.HasOne("AI2_Backend.Entities.Qualification", "Qualification")
@@ -270,8 +224,6 @@ namespace AI2_Backend.Migrations
 
             modelBuilder.Entity("AI2_Backend.Entities.User", b =>
                 {
-                    b.Navigation("UserPreferences");
-
                     b.Navigation("UserQualifications");
                 });
 #pragma warning restore 612, 618
