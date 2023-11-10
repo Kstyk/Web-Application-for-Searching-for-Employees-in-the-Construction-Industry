@@ -17,6 +17,9 @@ namespace AI2_Backend.Entities
         public DbSet<Stats> Stats { get; set; }
         public DbSet<SavedProfile> SavedProfiles { get; set; }
         public DbSet<UserPreferences> UserPreferences { get; set; }
+        public DbSet<InvitationHistory> InvitationHistories { get; set; }
+        public DbSet<Experience> Experiences { get; set; }
+        public DbSet<UserExperience> UserExperiences { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -66,6 +69,42 @@ namespace AI2_Backend.Entities
                 .WithOne(e => e.UserPreferences)
                 .HasForeignKey<UserPreferences>(e => e.EmployeeId)
                 .IsRequired();
+
+            modelBuilder.Entity<InvitationHistory>()
+                .Property(e => e.Title)
+                .HasColumnType("text")
+                .HasMaxLength(1000);
+
+            modelBuilder.Entity<InvitationHistory>()
+                .Property(e => e.Message)
+                .HasColumnType("text")
+                .HasMaxLength(10000);
+
+            modelBuilder.Entity<InvitationHistory>()
+                .Property(e => e.Company)
+                .HasColumnType("text")
+                .HasMaxLength(255);
+
+            modelBuilder.Entity<Experience>()
+                .Property(e => e.Company)
+                .HasColumnType("text")
+                .HasMaxLength(255);
+
+            modelBuilder.Entity<Experience>()
+                .Property(e => e.Description)
+                .HasColumnType("text")
+                .HasMaxLength(2000);
+
+            modelBuilder.Entity<UserExperience>()
+                .HasOne(uq => uq.Employee)
+                .WithMany(u => u.UserExperiences)
+                .HasForeignKey(uq => uq.EmployeeId);
+
+            modelBuilder.Entity<UserExperience>()
+                .HasOne(uq => uq.Experience)
+                .WithMany(q => q.UserExperiences)
+                .HasForeignKey(uq => uq.ExperienceId);
+
         }
 
 
