@@ -3,6 +3,7 @@ using System;
 using AI2_Backend.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,80 +11,16 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AI2_Backend.Migrations
 {
     [DbContext(typeof(AIDbContext))]
-    partial class AIDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231109201931_Add UserPreferences Table")]
+    partial class AddUserPreferencesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
-
-            modelBuilder.Entity("AI2_Backend.Entities.Experience", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Company")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("text");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("text");
-
-                    b.Property<int>("EndYear")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StartYear")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Experiences");
-                });
-
-            modelBuilder.Entity("AI2_Backend.Entities.InvitationHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Company")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("DateOfSending")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasMaxLength(10000)
-                        .HasColumnType("text");
-
-                    b.Property<int>("RecruiterId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.HasIndex("RecruiterId");
-
-                    b.ToTable("InvitationHistories");
-                });
 
             modelBuilder.Entity("AI2_Backend.Entities.Qualification", b =>
                 {
@@ -205,27 +142,6 @@ namespace AI2_Backend.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("AI2_Backend.Entities.UserExperience", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ExperienceId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.HasIndex("ExperienceId");
-
-                    b.ToTable("UserExperiences");
-                });
-
             modelBuilder.Entity("AI2_Backend.Entities.UserPreferences", b =>
                 {
                     b.Property<int>("Id")
@@ -279,25 +195,6 @@ namespace AI2_Backend.Migrations
                     b.ToTable("UserQualifications");
                 });
 
-            modelBuilder.Entity("AI2_Backend.Entities.InvitationHistory", b =>
-                {
-                    b.HasOne("AI2_Backend.Entities.User", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AI2_Backend.Entities.User", "Recruiter")
-                        .WithMany()
-                        .HasForeignKey("RecruiterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
-
-                    b.Navigation("Recruiter");
-                });
-
             modelBuilder.Entity("AI2_Backend.Entities.SavedProfile", b =>
                 {
                     b.HasOne("AI2_Backend.Entities.User", "Employee")
@@ -339,25 +236,6 @@ namespace AI2_Backend.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("AI2_Backend.Entities.UserExperience", b =>
-                {
-                    b.HasOne("AI2_Backend.Entities.User", "Employee")
-                        .WithMany("UserExperiences")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AI2_Backend.Entities.Experience", "Experience")
-                        .WithMany("UserExperiences")
-                        .HasForeignKey("ExperienceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
-
-                    b.Navigation("Experience");
-                });
-
             modelBuilder.Entity("AI2_Backend.Entities.UserPreferences", b =>
                 {
                     b.HasOne("AI2_Backend.Entities.User", "Employee")
@@ -388,11 +266,6 @@ namespace AI2_Backend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("AI2_Backend.Entities.Experience", b =>
-                {
-                    b.Navigation("UserExperiences");
-                });
-
             modelBuilder.Entity("AI2_Backend.Entities.Qualification", b =>
                 {
                     b.Navigation("UserQualifications");
@@ -400,8 +273,6 @@ namespace AI2_Backend.Migrations
 
             modelBuilder.Entity("AI2_Backend.Entities.User", b =>
                 {
-                    b.Navigation("UserExperiences");
-
                     b.Navigation("UserPreferences");
 
                     b.Navigation("UserQualifications");
