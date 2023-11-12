@@ -38,7 +38,7 @@ namespace AI2_Backend.Seeders
                     Name = "recruiter"
                 },
                 new Role() {
-                    Name="worker"
+                    Name="employee"
                 } 
             };
 
