@@ -1,4 +1,5 @@
 ﻿using AI2_Backend.Models;
+using AI2_Backend.Models.Queries;
 using AI2_Backend.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,6 +22,14 @@ namespace AI2_Backend.Controllers
             var userProfile = _employeeService.GetEmployeeProfile(employeeId);
 
             return Ok(userProfile);
+        }
+
+        [HttpGet("all")]
+        public ActionResult<IEnumerable<UserProfileDto>> GetAllEmployees([FromQuery] EmployeeQuery query)
+        {
+            var employees = _employeeService.GetAll(query);
+
+            return Ok(employees);
         }
     }
 }
