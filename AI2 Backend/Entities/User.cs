@@ -17,6 +17,8 @@ namespace AI2_Backend.Entities
         public decimal? RequiredPayment { get; set; }
         public ICollection<UserQualification> UserQualifications { get; set; } = new List<UserQualification>();
         public ICollection<UserExperience> UserExperiences { get; set; } = new List<UserExperience>();
+        public ICollection<SavedProfile> SavedProfiles { get; set; } = new List<SavedProfile>();
+        public ICollection<InvitationHistory> InvitationsHistory { get; set; } = new List<InvitationHistory>();
         public UserPreferences? UserPreferences { get; set; }
 
     }

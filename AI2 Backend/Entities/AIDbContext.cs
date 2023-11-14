@@ -57,7 +57,8 @@ namespace AI2_Backend.Entities
             modelBuilder.Entity<UserQualification>()
                 .HasOne(uq => uq.User)
                 .WithMany(u => u.UserQualifications)
-                .HasForeignKey(uq => uq.UserId);
+                .HasForeignKey(uq => uq.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<UserQualification>()
                 .HasOne(uq => uq.Qualification)
@@ -68,6 +69,7 @@ namespace AI2_Backend.Entities
                 .HasOne(e => e.Employee)
                 .WithOne(e => e.UserPreferences)
                 .HasForeignKey<UserPreferences>(e => e.EmployeeId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired();
 
             modelBuilder.Entity<InvitationHistory>()
@@ -98,13 +100,25 @@ namespace AI2_Backend.Entities
             modelBuilder.Entity<UserExperience>()
                 .HasOne(uq => uq.Employee)
                 .WithMany(u => u.UserExperiences)
-                .HasForeignKey(uq => uq.EmployeeId);
+                .HasForeignKey(uq => uq.EmployeeId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<UserExperience>()
                 .HasOne(uq => uq.Experience)
                 .WithMany(q => q.UserExperiences)
                 .HasForeignKey(uq => uq.ExperienceId);
 
+            modelBuilder.Entity<SavedProfile>()
+                .HasOne(uq => uq.Recruiter)
+                .WithMany(u => u.SavedProfiles)
+                .HasForeignKey(uq => uq.RecruiterId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            modelBuilder.Entity<InvitationHistory>()
+                .HasOne(uq => uq.Recruiter)
+                .WithMany(u => u.InvitationsHistory)
+                .HasForeignKey(uq => uq.RecruiterId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
 
 
