@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AI2_Backend.Controllers
 {
-    [Route("api/qualification")]
+    [Route("api/qualifications")]
     [ApiController]
     public class QualificationController : ControllerBase
     {
@@ -16,7 +16,7 @@ namespace AI2_Backend.Controllers
             _qualificationService = qualificationService;
         }
 
-        [HttpGet("all")]
+        [HttpGet("")]
         public ActionResult<List<QualificationDto>> GetAllCategories()
         {
             var qualifications = _qualificationService.GetAllQualifications();
