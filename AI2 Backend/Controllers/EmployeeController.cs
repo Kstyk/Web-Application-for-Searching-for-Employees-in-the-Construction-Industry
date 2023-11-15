@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AI2_Backend.Controllers
 {
-    [Route("api/employee")]
+    [Route("api/employees")]
     [ApiController]
     public class EmployeeController : ControllerBase
     {
@@ -16,7 +16,7 @@ namespace AI2_Backend.Controllers
             _employeeService = employeeService;
         }
 
-        [HttpGet("profile/{employeeId}")]
+        [HttpGet("{employeeId}")]
         public ActionResult<UserProfileDto> GetUserProfile([FromRoute] int employeeId)
         {
             var userProfile = _employeeService.GetEmployeeProfile(employeeId);
@@ -24,7 +24,7 @@ namespace AI2_Backend.Controllers
             return Ok(userProfile);
         }
 
-        [HttpGet("all")]
+        [HttpGet("")]
         public ActionResult<IEnumerable<UserProfileDto>> GetAllEmployees([FromQuery] EmployeeQuery query)
         {
             var employees = _employeeService.GetAll(query);
