@@ -60,5 +60,14 @@ namespace AI2_Backend.Controllers
 
             return Ok(userProfile);
         }
+
+        [HttpDelete("delete")]
+        [Authorize]
+        public ActionResult DeleteAccount()
+        {
+            _accountService.DeleteProfile();
+
+            return Ok();
+        }
     }
 }

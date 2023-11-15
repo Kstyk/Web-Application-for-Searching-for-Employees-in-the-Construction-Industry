@@ -8,5 +8,6 @@ namespace AI2_Backend.Services
         string GenerateJwt(LoginUserDto loginUserDto);
         void UpdateUser(UpdateUserDto updateUserDto);
         UserProfileDto GetLoggedUserProfile();
+        void DeleteProfile();
     }
 }
