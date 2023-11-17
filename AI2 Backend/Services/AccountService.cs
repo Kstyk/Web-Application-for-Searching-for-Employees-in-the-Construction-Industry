@@ -28,13 +28,15 @@ namespace AI2_Backend.Services
             _userContextService = userContext;
         }
 
-        public void RegisterUser(RegisterUserDto dto)
+        public UserProfileDto RegisterUser(RegisterUserDto dto)
         {
             var newUser = _mapper.Map<User>(dto);
             var hashedPassword = _passwordHasher.HashPassword(newUser, dto.Password);
             newUser.Password = hashedPassword;
             _context.Users.Add(newUser);
             _context.SaveChanges();
+
+            return _mapper.Map<UserProfileDto>(newUser);
         }
 
         public string GenerateJwt(LoginUserDto loginUserDto)

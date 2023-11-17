@@ -2,11 +2,15 @@
 using AI2_Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace AI2_Backend.Controllers
 {
     [Route("api/account")]
     [ApiController]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public class AccountController : ControllerBase
     {
         private IAccountService _accountService;
@@ -17,14 +21,18 @@ namespace AI2_Backend.Controllers
         }
 
         [HttpPost("register")]
+        [ProducesResponseType(typeof(UserProfileDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [SwaggerOperation("Rejestracja nowego użytkownika.")]
         public ActionResult ReqisterUser([FromBody] RegisterUserDto dto)
         {
-            _accountService.RegisterUser(dto);
+            var entity = _accountService.RegisterUser(dto);
 
-            return Ok();
+            return Created(nameof(entity), entity);
         }
 
         [HttpPost("login")]
+        [SwaggerOperation("Logowanie do systemu.")]
         public ActionResult LoginUser([FromBody] LoginUserDto dto)
         {
             try
@@ -32,13 +40,14 @@ namespace AI2_Backend.Controllers
                 string token = _accountService.GenerateJwt(dto);
 
                 return Ok(token);
-            } catch(Exception ex)
+            } catch(Exception)
             {
                 return Unauthorized("Niepoprawne dane logowawnia.");
             }
         }
 
         [HttpPut("update")]
+        [SwaggerOperation("Edycja profilu.")]
         [Authorize]
         public ActionResult UpdateUser([FromBody] UpdateUserDto dto) {
             try
@@ -53,6 +62,7 @@ namespace AI2_Backend.Controllers
         }
 
         [HttpGet("my-profile")]
+        [SwaggerOperation("Pobranie profilu zalogowanego użytkownika.")]
         [Authorize]
         public ActionResult<UserProfileDto> GetUserProfile()
         {
@@ -62,6 +72,7 @@ namespace AI2_Backend.Controllers
         }
 
         [HttpDelete("delete")]
+        [SwaggerOperation("Usunięcie konta.")]
         [Authorize]
         public ActionResult DeleteAccount()
         {
