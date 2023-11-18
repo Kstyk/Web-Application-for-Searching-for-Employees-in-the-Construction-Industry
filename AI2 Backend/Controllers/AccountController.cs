@@ -1,4 +1,5 @@
 ﻿using AI2_Backend.Models;
+using AI2_Backend.Models.DefaultValues;
 using AI2_Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,10 +21,11 @@ namespace AI2_Backend.Controllers
             _accountService = accountService;
         }
 
-        [HttpPost("register")]
         [ProducesResponseType(typeof(UserProfileDto), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [SwaggerOperation("Rejestracja nowego użytkownika.")]
+        [SwaggerRequestExample(typeof(RegisterUserDto), typeof(RegisterUserDtoDefault))]
+        [HttpPost("register")]
         public ActionResult ReqisterUser([FromBody] RegisterUserDto dto)
         {
             var entity = _accountService.RegisterUser(dto);
@@ -31,8 +33,9 @@ namespace AI2_Backend.Controllers
             return Created(nameof(entity), entity);
         }
 
-        [HttpPost("login")]
         [SwaggerOperation("Logowanie do systemu.")]
+        [SwaggerRequestExample(typeof(LoginUserDto), typeof(LoginUserDtoDefault))]
+        [HttpPost("login")]
         public ActionResult LoginUser([FromBody] LoginUserDto dto)
         {
             try
@@ -46,8 +49,9 @@ namespace AI2_Backend.Controllers
             }
         }
 
-        [HttpPut("update")]
         [SwaggerOperation("Edycja profilu.")]
+        [SwaggerRequestExample(typeof(UpdateUserDto), typeof(UpdateUserDtoDefault))]
+        [HttpPut("update")]
         [Authorize]
         public ActionResult UpdateUser([FromBody] UpdateUserDto dto) {
             try
