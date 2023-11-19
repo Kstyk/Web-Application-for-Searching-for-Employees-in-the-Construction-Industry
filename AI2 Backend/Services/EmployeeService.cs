@@ -25,6 +25,7 @@ namespace AI2_Backend.Services
                 .Include(q => q.UserQualifications).ThenInclude(u => u.Qualification)
                 .FirstOrDefault(u => u.Id == employeeId));
 
+
             return userProfile;
         }
 

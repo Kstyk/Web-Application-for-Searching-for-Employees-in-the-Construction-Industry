@@ -33,6 +33,8 @@ namespace AI2_Backend.Controllers
             return Created(nameof(entity), entity);
         }
 
+        [ProducesResponseType(typeof(LoginUserDto), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [SwaggerOperation("Logowanie do systemu.")]
         [SwaggerRequestExample(typeof(LoginUserDto), typeof(LoginUserDtoDefault))]
         [HttpPost("login")]
@@ -49,6 +51,9 @@ namespace AI2_Backend.Controllers
             }
         }
 
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails),StatusCodes.Status400BadRequest)]
         [SwaggerOperation("Edycja profilu.")]
         [SwaggerRequestExample(typeof(UpdateUserDto), typeof(UpdateUserDtoDefault))]
         [HttpPut("update")]
@@ -65,6 +70,8 @@ namespace AI2_Backend.Controllers
             }
         }
 
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(UserProfileDto),StatusCodes.Status200OK)]
         [HttpGet("my-profile")]
         [SwaggerOperation("Pobranie profilu zalogowanego użytkownika.")]
         [Authorize]
@@ -75,6 +82,8 @@ namespace AI2_Backend.Controllers
             return Ok(userProfile);
         }
 
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpDelete("delete")]
         [SwaggerOperation("Usunięcie konta.")]
         [Authorize]
@@ -82,7 +91,7 @@ namespace AI2_Backend.Controllers
         {
             _accountService.DeleteProfile();
 
-            return Ok();
+            return NoContent();
         }
     }
 }
