@@ -18,6 +18,7 @@ using AI2_Backend.Seeders;
 using System.Text.Json.Serialization;
 using AI2_Backend.seeders;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +56,8 @@ builder.Services.AddControllers().AddJsonOptions(opt =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+    c.ExampleFilters();
+    c.EnableAnnotations();
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
@@ -85,6 +88,7 @@ builder.Services.AddSwaggerGen(c =>
           }
         });
 });
+builder.Services.AddSwaggerExamplesFromAssemblies(Assembly.GetEntryAssembly());
 
 builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());

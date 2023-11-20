@@ -1,12 +1,17 @@
 ﻿using AI2_Backend.Models;
+using AI2_Backend.Models.DefaultValues;
 using AI2_Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace AI2_Backend.Controllers
 {
     [Route("api/account")]
     [ApiController]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public class AccountController : ControllerBase
     {
         private IAccountService _accountService;
@@ -16,14 +21,22 @@ namespace AI2_Backend.Controllers
             _accountService = accountService;
         }
 
+        [ProducesResponseType(typeof(UserProfileDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [SwaggerOperation("Rejestracja nowego użytkownika.")]
+        [SwaggerRequestExample(typeof(RegisterUserDto), typeof(RegisterUserDtoDefault))]
         [HttpPost("register")]
         public ActionResult ReqisterUser([FromBody] RegisterUserDto dto)
         {
-            _accountService.RegisterUser(dto);
+            var entity = _accountService.RegisterUser(dto);
 
-            return Ok();
+            return Created(nameof(entity), entity);
         }
 
+        [ProducesResponseType(typeof(LoginUserDto), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [SwaggerOperation("Logowanie do systemu.")]
+        [SwaggerRequestExample(typeof(LoginUserDto), typeof(LoginUserDtoDefault))]
         [HttpPost("login")]
         public ActionResult LoginUser([FromBody] LoginUserDto dto)
         {
@@ -32,12 +45,17 @@ namespace AI2_Backend.Controllers
                 string token = _accountService.GenerateJwt(dto);
 
                 return Ok(token);
-            } catch(Exception ex)
+            } catch(Exception)
             {
                 return Unauthorized("Niepoprawne dane logowawnia.");
             }
         }
 
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails),StatusCodes.Status400BadRequest)]
+        [SwaggerOperation("Edycja profilu.")]
+        [SwaggerRequestExample(typeof(UpdateUserDto), typeof(UpdateUserDtoDefault))]
         [HttpPut("update")]
         [Authorize]
         public ActionResult UpdateUser([FromBody] UpdateUserDto dto) {
@@ -52,7 +70,10 @@ namespace AI2_Backend.Controllers
             }
         }
 
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(UserProfileDto),StatusCodes.Status200OK)]
         [HttpGet("my-profile")]
+        [SwaggerOperation("Pobranie profilu zalogowanego użytkownika.")]
         [Authorize]
         public ActionResult<UserProfileDto> GetUserProfile()
         {
@@ -61,13 +82,16 @@ namespace AI2_Backend.Controllers
             return Ok(userProfile);
         }
 
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpDelete("delete")]
+        [SwaggerOperation("Usunięcie konta.")]
         [Authorize]
         public ActionResult DeleteAccount()
         {
             _accountService.DeleteProfile();
 
-            return Ok();
+            return NoContent();
         }
     }
 }
