@@ -5,7 +5,7 @@
         public int Id { get; set; }
         public int EmployeeId { get; set; }
         public virtual User? Employee { get; set; }
-        public int CounterDaily { get; set; }
-        public int CounterMonthly { get; set; }
+        public int CounterDaily { get; set; } = 0;
+        public int CounterMonthly { get; set; } = 0;
     }
 }

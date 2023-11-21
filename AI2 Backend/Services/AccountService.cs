@@ -34,7 +34,26 @@ namespace AI2_Backend.Services
             var hashedPassword = _passwordHasher.HashPassword(newUser, dto.Password);
             newUser.Password = hashedPassword;
             _context.Users.Add(newUser);
+
+            if (dto.RoleId == 2) {
+
+                var userPrefs = new UserPreferences
+                {
+                    Employee = newUser
+                };
+
+                _context.UserPreferences.Add(userPrefs);
+
+                var userStats = new Stats
+                {
+                    Employee = newUser
+                };
+
+                _context.Stats.Add(userStats);
+            }
+
             _context.SaveChanges();
+
 
             return _mapper.Map<UserProfileDto>(newUser);
         }
