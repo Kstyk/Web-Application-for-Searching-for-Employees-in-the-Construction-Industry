@@ -34,7 +34,26 @@ namespace AI2_Backend.Services
             var hashedPassword = _passwordHasher.HashPassword(newUser, dto.Password);
             newUser.Password = hashedPassword;
             _context.Users.Add(newUser);
+
+            if (dto.RoleId == 2) {
+
+                var userPrefs = new UserPreferences
+                {
+                    Employee = newUser
+                };
+
+                _context.UserPreferences.Add(userPrefs);
+
+                var userStats = new Stats
+                {
+                    Employee = newUser
+                };
+
+                _context.Stats.Add(userStats);
+            }
+
             _context.SaveChanges();
+
 
             return _mapper.Map<UserProfileDto>(newUser);
         }
@@ -109,12 +128,13 @@ namespace AI2_Backend.Services
             _context.SaveChanges();
         }
 
-        public UserProfileDto GetLoggedUserProfile()
+        public MyProfileDto GetLoggedUserProfile()
         {
             var userId = _userContextService.GetUserId;
 
-            var userProfile = _mapper.Map<UserProfileDto>(_context.Users
+            var userProfile = _mapper.Map<MyProfileDto>(_context.Users
                 .Include(q => q.UserQualifications).ThenInclude(u => u.Qualification)
+                .Include(q => q.UserExperiences).ThenInclude(u => u.Experience)
                 .FirstOrDefault(u => u.Id == userId));
 
             return userProfile;

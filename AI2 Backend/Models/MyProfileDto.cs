@@ -3,9 +3,8 @@ using AI2_Backend.Enums;
 
 namespace AI2_Backend.Models
 {
-    public class UserProfileDto
+    public class MyProfileDto
     {
-
         public int Id { get; set; }
         public int RoleId { get; set; }
         public string Email { get; set; }
@@ -17,7 +16,6 @@ namespace AI2_Backend.Models
         public decimal? RequiredPayment { get; set; }
         public ICollection<QualificationDto> UserQualifications { get; set; }
         public ICollection<UserExperience> UserExperiences { get; set; } = new List<UserExperience>();
-
 
     }
 }

@@ -21,12 +21,26 @@ namespace AI2_Backend.Services
 
         public UserProfileDto GetEmployeeProfile(int employeeId)
         {
-            var userProfile = _mapper.Map<UserProfileDto>(_context.Users
+
+            var user = _context.Users
                 .Include(q => q.UserQualifications).ThenInclude(u => u.Qualification)
-                .FirstOrDefault(u => u.Id == employeeId));
+                .Include(q => q.UserExperiences).ThenInclude(u => u.Experience)
+                .Include(q => q.UserPreferences)
+                .FirstOrDefault(u => u.Id == employeeId);
+
+            if (user != null)
+            {
+                if (user?.UserPreferences?.IsVisibleProfile == false)
+                {
+                    return null;
+                }
+
+                var userProfile = _mapper.Map<UserProfileDto>(user);
 
 
-            return userProfile;
+                return userProfile;
+            }
+            else return null;
         }
 
         public PagedResult<UserProfileDto> GetAll(EmployeeQuery query)
@@ -35,36 +49,37 @@ namespace AI2_Backend.Services
             var baseQuery = _context
                 .Users
                 .Include(q => q.UserQualifications).ThenInclude(u => u.Qualification)
-                .Where(r => r.Role.Name == "employee");
+                .Include(q => q.UserPreferences)
+                .Where(r => r.Role.Name == "employee" && r.UserPreferences.IsVisibleProfile == true);
 
             // filtrowanie
             if (query.MinimumPayment is not null)
             {
                 baseQuery = baseQuery
-                    .Where(r => r.RequiredPayment >= query.MinimumPayment);
+                    .Where(r => r.RequiredPayment >= query.MinimumPayment && r.UserPreferences.IsVisibleRequiredPayment == true && r.UserPreferences.IsVisibleProfile == true);
             }
             if (query.MaximumPayment is not null)
             {
                 baseQuery = baseQuery
-                    .Where(r => r.RequiredPayment <= query.MaximumPayment);
+                    .Where(r => r.RequiredPayment <= query.MaximumPayment && r.UserPreferences.IsVisibleRequiredPayment == true && r.UserPreferences.IsVisibleProfile == true);
             }
 
             if (query.QualificationId is not null)
             {
                 baseQuery = baseQuery
-                    .Where(r => r.UserQualifications.Any(uq => uq.QualificationId == query.QualificationId));
+                    .Where(r => r.UserQualifications.Any(uq => uq.QualificationId == query.QualificationId && r.UserPreferences.IsVisibleProfile == true && r.UserPreferences.IsVisibleSkills == true));
             }
 
             if (query.Voivodeship is not null)
             {
                 baseQuery = baseQuery
-                    .Where(r => r.Voivodeship == query.Voivodeship);
+                    .Where(r => r.Voivodeship == query.Voivodeship && r.UserPreferences.IsVisibleVoivodeship == true && r.UserPreferences.IsVisibleProfile == true);
             }
 
             if (query.SearchText is not null)
             {
                 baseQuery = baseQuery
-                    .Where(r => r.FirstName.Contains(query.SearchText) || r.LastName.Contains(query.SearchText));
+                    .Where(r => (r.FirstName.Contains(query.SearchText) || r.LastName.Contains(query.SearchText)) && r.UserPreferences.IsVisibleProfile == true && r.UserPreferences.IsVisibleVoivodeship == true);
             }
 
 
