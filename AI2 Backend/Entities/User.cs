@@ -19,7 +19,9 @@ namespace AI2_Backend.Entities
         public ICollection<UserExperience> UserExperiences { get; set; } = new List<UserExperience>();
         public ICollection<SavedProfile> SavedProfiles { get; set; } = new List<SavedProfile>();
         public ICollection<InvitationHistory> InvitationsHistory { get; set; } = new List<InvitationHistory>();
-        public UserPreferences? UserPreferences { get; set; }
+        public virtual UserPreferences? UserPreferences { get; set; }
+
+        
 
     }
 }

@@ -75,7 +75,7 @@ namespace AI2_Backend.Controllers
         [HttpGet("my-profile")]
         [SwaggerOperation("Pobranie profilu zalogowanego użytkownika.")]
         [Authorize]
-        public ActionResult<UserProfileDto> GetUserProfile()
+        public ActionResult<MyProfileDto> GetUserProfile()
         {
             var userProfile = _accountService.GetLoggedUserProfile();
 

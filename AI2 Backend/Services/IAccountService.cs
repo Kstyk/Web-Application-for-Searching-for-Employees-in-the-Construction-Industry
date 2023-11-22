@@ -8,7 +8,7 @@ namespace AI2_Backend.Services
         UserProfileDto RegisterUser(RegisterUserDto dto);
         string GenerateJwt(LoginUserDto loginUserDto);
         void UpdateUser(UpdateUserDto updateUserDto);
-        UserProfileDto GetLoggedUserProfile();
+        MyProfileDto GetLoggedUserProfile();
         void DeleteProfile();
     }
 }

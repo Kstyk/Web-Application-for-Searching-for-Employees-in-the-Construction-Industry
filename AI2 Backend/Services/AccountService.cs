@@ -128,12 +128,13 @@ namespace AI2_Backend.Services
             _context.SaveChanges();
         }
 
-        public UserProfileDto GetLoggedUserProfile()
+        public MyProfileDto GetLoggedUserProfile()
         {
             var userId = _userContextService.GetUserId;
 
-            var userProfile = _mapper.Map<UserProfileDto>(_context.Users
+            var userProfile = _mapper.Map<MyProfileDto>(_context.Users
                 .Include(q => q.UserQualifications).ThenInclude(u => u.Qualification)
+                .Include(q => q.UserExperiences).ThenInclude(u => u.Experience)
                 .FirstOrDefault(u => u.Id == userId));
 
             return userProfile;
