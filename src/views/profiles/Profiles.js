@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
 import {
   TextField,
   Button,
@@ -17,30 +19,158 @@ import Pagination from '@mui/lab/Pagination';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
+const api = axios.create({
+  baseURL: 'http://localhost:5072/api',
+});
+
 const Profiles = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortOrder, setSortOrder] = useState('asc');
-  const [filterCriteria, setFilterCriteria] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const profilesPerPage = 10;
 
-  const profilesData = [
+  /*const profilesData = [
     { id: 1, name: 'Doe John', occupation: ['Developer'], email: 'john@example.com' },
     { id: 5, name: 'Nowak Bob', occupation: ['Plumber'], email: 'nowak@example.com' },
     { id: 2, name: 'Smith Jane', occupation: ['Designer', 'Manager'], email: 'jane@example.com' },
-  ];
+  ];*/
+
+  const [profilesData, setProfilesData] = useState(
+  [
+    {
+      id: 0,
+      roleId: 0,
+      email: 'string',
+      firstName: 'string',
+      lastName: 'string',
+      aboutMe: 'string',
+      education: 'string',
+      voivodeship: 0,
+      requiredPayment: 0,
+      userQualifications: [
+        {
+          id: 0,
+          name: 'string',
+        },
+      ],
+      userExperiences: [
+        {
+          id: 0,
+          experienceId: 0,
+          experience: {
+            id: 0,
+            startYear: 0,
+            endYear: 0,
+            description: 'string',
+            company: 'string',
+            userExperiences: ['string'],
+          },
+          employeeId: 0,
+          employee: {
+            id: 0,
+            roleId: 0,
+            role: {
+              id: 0,
+              name: 'string',
+            },
+            email: 'string',
+            password: 'string',
+            firstName: 'string',
+            lastName: 'string',
+            aboutMe: 'string',
+            education: 'string',
+            voivodeship: 0,
+            requiredPayment: 0,
+            userQualifications: [
+              {
+                userId: 0,
+                user: 'string',
+                qualificationId: 0,
+                qualification: {
+                  id: 0,
+                  name: 'string',
+                  userQualifications: ['string'],
+                },
+              },
+            ],
+            userExperiences: ['string'],
+            savedProfiles: [
+              {
+                id: 0,
+                employeeId: 0,
+                employee: 'string',
+                recruiterId: 0,
+                recruiter: 'string',
+              },
+            ],
+            invitationsHistory: [
+              {
+                id: 0,
+                company: 'string',
+                dateOfSending: '2023-12-05T00:42:51.980Z',
+                recruiterId: 0,
+                recruiter: 'string',
+                employeeId: 0,
+                employee: 'string',
+                title: 'string',
+                message: 'string',
+              },
+            ],
+            userPreferences: {
+              id: 0,
+              employeeId: 0,
+              employee: 'string',
+              isVisibleProfile: true,
+              isVisibleAboutMe: true,
+              isVisibleSkills: true,
+              isVisibleExperience: true,
+              isVisibleEducation: true,
+              isVisibleVoivodeship: true,
+              isVisibleRequiredPayment: true,
+            },
+          },
+        },
+      ],
+    },
+  ]
+  );
 
   const [favoriteProfiles, setFavoriteProfiles] = useState(new Set());
 
-  const filteredProfiles = profilesData.filter((profile) => {
-    if (filterCriteria === 'all' || profile.occupation.includes(filterCriteria)) {
-      return (
-        profile.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        profile.email.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    return false;
-  });
+  useEffect(() => {
+    const fetchUserProfiles = async () => {
+        try {
+          const response = await api.get('/employees', {});
+
+          const users = response.data;
+          if (Array.isArray(users)) {
+            setProfilesData(users);
+          } else {
+            console.error('Invalid user data:', users);
+          }
+        } catch (error) {
+          console.error('Error fetching user profile:', error.message);
+        }
+    };
+    fetchUserProfiles();
+  }, [profilesData]);
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [filterCriteria, setFilterCriteria] = useState('all');
+
+  const [filteredProfiles, setFilteredProfiles] = useState([]);
+
+  useEffect(() => {
+    const updatedFilteredProfiles = profilesData.filter((profile) => {
+      if (filterCriteria === 'all' || profile.occupation.includes(filterCriteria)) {
+        return (
+          profile.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          profile.email.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
+      return false;
+    });
+    setFilteredProfiles(updatedFilteredProfiles);
+  }, [profilesData, filterCriteria, searchTerm]);
 
   const sortedProfiles = [...filteredProfiles].sort((a, b) => {
     const order = sortOrder === 'asc' ? 1 : -1;
@@ -110,8 +240,18 @@ const Profiles = () => {
             {profilesToDisplay.map((profile, index) => (
               <TableRow key={index + 1}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell>{profile.name}</TableCell>
-                <TableCell>{profile.occupation.join(', ')}</TableCell>
+                <TableCell>{`${profile.firstName} ${profile.lastName}`}</TableCell>
+                <TableCell>
+                  {profile.userQualifications &&
+                    profile.userQualifications.length > 0 && (
+                      <ul>
+                        {profile.userQualifications.map((qualification) => (
+                          <li key={qualification.id}>{qualification.name}</li>
+                        ))}
+                      </ul>
+                    )
+                  }
+                </TableCell>
                 <TableCell>{profile.email}</TableCell>
                 <TableCell>
                   <Link href={`/profile/${profile.id}`}>Zobacz profil</Link>

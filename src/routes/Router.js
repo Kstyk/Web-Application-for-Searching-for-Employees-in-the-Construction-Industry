@@ -13,6 +13,7 @@ const Register = Loadable(lazy(() => import('../views/authentication/Register'))
 const Login = Loadable(lazy(() => import('../views/authentication/Login')));
 const Profiles = Loadable(lazy(() => import('../views/profiles/Profiles')));
 const Profile = Loadable(lazy(() => import('../views/profiles/Profile')));
+const MyProfile = Loadable(lazy(() => import('../views/profiles/MyProfile')));
 const SavedProfiles = Loadable(lazy(() => import('../views/profiles/SavedProfiles')));
 const EditProfile = Loadable(lazy(() => import('../views/profiles/EditProfile')));
 const SendMail = Loadable(lazy(() => import('../views/mails/SendMail')));
@@ -27,8 +28,11 @@ const Router = [
       { path: '/dashboard', exact: true, element: <Dashboard /> },
       { path: '/profiles', exact: true, element: <Profiles /> },
       { path: '/saved_profiles', exact: true, element: <SavedProfiles /> },
+      { path: '/profile', exact: true, element: <Profile /> },
+      { path: '/my_profile', exact: true, element: <MyProfile /> },
+      { path: '/edit_profile', exact: true, element: <EditProfile /> },
       { path: '/profile/:id', exact: true, element: <Profile /> },
-      { path: '/edit_profile/:id', exact: true, element: <EditProfile /> },
+      //{ path: '/edit_profile/:id', exact: true, element: <EditProfile /> },
       { path: '/mail_send/:id', exact: true, element: <SendMail /> },
       { path: '/mail_history', exact: true, element: <HistoryMails /> },
       { path: '*', element: <Navigate to="/auth/404" /> },
