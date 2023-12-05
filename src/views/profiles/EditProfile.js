@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+
 import {
     Card,
     CardContent,
@@ -10,7 +12,11 @@ import {
     Button,
     Typography,
 } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+
+const api = axios.create({
+    baseURL: 'http://localhost:5072/api',
+  });
 
 const EditProfile = () => {
     const [userData, setUserData] = useState({
@@ -47,8 +53,24 @@ const EditProfile = () => {
         });
     };
 
-    const handleSubmit = () => {
-        // Tutaj możesz dodać logikę zapisu zmian w danych użytkownika
+    const navigate = useNavigate();
+    const handleSubmit = () => {  // dane w formularzu chyba powinny być przechowywane w innej zmiennej niż userData
+        const updateUserProfile = async () => {
+        try {
+            const token = localStorage.getItem('token');
+
+            const response = await api.put('/account/update', userData, {
+            headers: {
+                Authorization: `${token}`,
+            },
+            });
+            navigate('/account/my_profile');
+        } catch (error) {
+            console.error('Error fetching user profile:', error.message);
+        }
+            
+        };
+        updateUserProfile();
     };
 
     return (

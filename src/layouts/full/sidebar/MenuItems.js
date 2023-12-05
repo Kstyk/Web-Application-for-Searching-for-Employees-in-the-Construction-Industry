@@ -4,7 +4,9 @@ import {
 
 import { uniqueId } from 'lodash';
 
-const Menuitems = [
+import { useAuth } from '../../../contexts/AuthContext';
+
+var items = [
   {
     navlabel: true,
     subheader: 'xBuild',
@@ -40,5 +42,15 @@ const Menuitems = [
     href: '/auth/register',
   },
 ];
+
+const Menuitems = () => {
+  const { isLoggedIn } = useAuth();
+
+  if (isLoggedIn) {
+    return items.slice(0, -3);
+  } else {
+    return items;
+  }
+};
 
 export default Menuitems;

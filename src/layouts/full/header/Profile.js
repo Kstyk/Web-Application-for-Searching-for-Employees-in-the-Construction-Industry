@@ -15,8 +15,17 @@ import { IconListCheck, IconMail, IconUser } from '@tabler/icons';
 
 import ProfileImg from 'src/assets/images/profile/user-1.jpg';
 
+import { useAuth } from '../../../contexts/AuthContext';
+
 const Profile = () => {
-  const id = 1
+  const { isLoggedIn, logout } = useAuth();
+
+  const handleLogout = (e) => {
+    e.preventDefault();
+
+    logout();
+  };
+
   const [anchorEl2, setAnchorEl2] = useState(null);
   const handleClick2 = (event) => {
     setAnchorEl2(event.currentTarget);
@@ -24,6 +33,12 @@ const Profile = () => {
   const handleClose2 = () => {
     setAnchorEl2(null);
   };
+
+  if (!isLoggedIn) {
+    return (
+      <Link to="/auth/login">Zaloguj się</Link>
+    )
+  }
 
   return (
     <Box>
@@ -66,7 +81,7 @@ const Profile = () => {
           },
         }}
       >
-        <MenuItem component={Link} to={`/profile/${id}`}>
+        <MenuItem component={Link} to={`/my_profile`}>
           <ListItemIcon>
             <IconUser width={20} />
           </ListItemIcon>
@@ -85,7 +100,7 @@ const Profile = () => {
           <ListItemText>Historia zaproszeń</ListItemText>
         </MenuItem>
         <Box mt={1} py={1} px={2}>
-          <Button to="/auth/login" variant="outlined" color="primary" component={Link} fullWidth>
+          <Button onClick={handleLogout} to="/auth/login" variant="outlined" color="primary" component={Link} fullWidth>
             Wyloguj
           </Button>
         </Box>

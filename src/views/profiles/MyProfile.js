@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-
 import { useParams, useNavigate, Link } from 'react-router-dom';
 
 import {
@@ -17,19 +15,143 @@ import {
 import { MailOutline, Edit, Delete } from '@mui/icons-material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+
 import ExperienceItem from './ExperienceItem';
 
+import { useAuth } from '../../contexts/AuthContext';
+
+import axios from 'axios';
+
 const api = axios.create({
-  baseURL: 'http://localhost:5072/api',
-});
+    baseURL: 'http://localhost:5072/api',
+  });
 
 const Profile = () => {
+  const { isLoggedIn } = useAuth();
+
+  const [userData, setUserData] = useState({
+    id: 0,
+    roleId: 0,
+    email: 'string',
+    firstName: 'string',
+    lastName: 'string',
+    aboutMe: 'string',
+    education: 'string',
+    voivodeship: 0,
+    requiredPayment: 0,
+    userQualifications: [
+      {
+        id: 0,
+        name: 'string',
+      },
+    ],
+    userExperiences: [
+      {
+        id: 0,
+        experienceId: 0,
+        experience: {
+          id: 0,
+          startYear: 0,
+          endYear: 0,
+          description: 'string',
+          company: 'string',
+          userExperiences: ['string'],
+        },
+        employeeId: 0,
+        employee: {
+          id: 0,
+          roleId: 0,
+          role: {
+            id: 0,
+            name: 'string',
+          },
+          email: 'string',
+          password: 'string',
+          firstName: 'string',
+          lastName: 'string',
+          aboutMe: 'string',
+          education: 'string',
+          voivodeship: 0,
+          requiredPayment: 0,
+          userQualifications: [
+            {
+              userId: 0,
+              user: 'string',
+              qualificationId: 0,
+              qualification: {
+                id: 0,
+                name: 'string',
+                userQualifications: ['string'],
+              },
+            },
+          ],
+          userExperiences: ['string'],
+          savedProfiles: [
+            {
+              id: 0,
+              employeeId: 0,
+              employee: 'string',
+              recruiterId: 0,
+              recruiter: 'string',
+            },
+          ],
+          invitationsHistory: [
+            {
+              id: 0,
+              company: 'string',
+              dateOfSending: '2023-12-04T22:55:19.556Z',
+              recruiterId: 0,
+              recruiter: 'string',
+              employeeId: 0,
+              employee: 'string',
+              title: 'string',
+              message: 'string',
+            },
+          ],
+          userPreferences: {
+            id: 0,
+            employeeId: 0,
+            employee: 'string',
+            isVisibleProfile: true,
+            isVisibleAboutMe: true,
+            isVisibleSkills: true,
+            isVisibleExperience: true,
+            isVisibleEducation: true,
+            isVisibleVoivodeship: true,
+            isVisibleRequiredPayment: true,
+          },
+        },
+      },
+    ],
+  });
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (isLoggedIn) {
+        try {
+          const token = localStorage.getItem('token');
+
+          const response = await api.get('/account/my-profile', {
+            headers: {
+              Authorization: `${token}`,
+            },
+          });
+
+          const user = response.data;
+          setUserData(user);
+        } catch (error) {
+          console.error('Error fetching user profile:', error.message);
+        }
+      }
+    };
+    fetchUserProfile();
+  }, [isLoggedIn]);
+
   const { id } = useParams();
   const navigate = useNavigate();
   const [favoriteProfiles, setFavoriteProfiles] = useState(new Set());
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
-  // Przykładowe dane użytkownika
   /*const userData = {
     id: 2,
     firstName: 'John',
@@ -41,34 +163,6 @@ const Profile = () => {
     shortInfo: 'Jestem doświadczonym hydraulikiem i tynkarzem.',
     school: 'Politechnika Warszawska',
   };*/
-
-  const [userData, setUserData] = useState({
-    id: id,
-    roleId: 0,
-    email: '',
-    firstName: null,
-    lastName: null,
-    aboutMe: null,
-    education: null,
-    voivodeship: null,
-    requiredPayment: null,
-    userQualifications: null,
-    userExperiences: [],
-  });
-
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-        try {
-          const response = await api.get(`/employees/${id}`);
-
-          const user = response.data;
-          setUserData(user);
-        } catch (error) {
-          console.error('Error fetching user profile:', error.message);
-        }
-    };
-    fetchUserProfile();
-  }, [userData]);
 
   const toggleFavorite = (profileId) => {
     const newFavoriteProfiles = new Set(favoriteProfiles);
@@ -111,8 +205,8 @@ const Profile = () => {
         <CardHeader
           avatar={
             <Avatar>
-              {userData.firstName?.charAt(0)}
-              {userData.lastName?.charAt(0)}
+              {userData.firstName ? userData.firstName.charAt(0) : ''}
+              {userData.lastName ? userData.lastName.charAt(0) : ''}
             </Avatar>
           }
           title={`${userData.firstName} ${userData.lastName}`}
@@ -127,7 +221,7 @@ const Profile = () => {
                   <FavoriteBorderIcon className="text-gray-600" />
                 )}
               </Button>
-              <Link href={`/edit_profile/${userData.id}`}>
+              <Link href={`/edit_profile`}>
                 <IconButton>
                   <Edit />
                 </IconButton>
@@ -146,7 +240,7 @@ const Profile = () => {
           <Typography>Nazwisko: {userData.lastName}</Typography>
           <Typography>Email: {userData.email}</Typography>
           <Typography>Interesujące zarobki: {userData.requiredPayment}</Typography>
-          <Typography>Specjalizacje: {userData.userQualifications}</Typography>
+          <Typography>Specjalizacje: {userData.userQualifications.map(qualification => qualification.name).join(', ')}</Typography>
           <Typography>Krótki opis: {userData.aboutMe}</Typography>
           <Typography>Ukończona szkoła: {userData.education}</Typography>
 
@@ -154,7 +248,7 @@ const Profile = () => {
             <Typography variant="subtitle1" gutterBottom>
               Doświadczenie:
             </Typography>
-            {userData.userExperiences.map((experience) => (
+            {userData.userExperiences.map(experience => (
               <ExperienceItem
                 key={experience.id}
                 from={experience.experience.startYear}
