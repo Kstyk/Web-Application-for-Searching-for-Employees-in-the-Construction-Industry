@@ -1,11 +1,15 @@
-﻿using AI2_Backend.Models;
+﻿using AI2_Backend.Entities;
+using AI2_Backend.Models;
 using AI2_Backend.Models.DefaultValues;
+using AI2_Backend.Models.DefaultValues.Responses;
 using AI2_Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
+using System.Net;
+using static AI2_Backend.Models.DefaultValues.Responses.ValidationUserErrorResponse;
 
 namespace AI2_Backend.Controllers
 {
@@ -21,10 +25,11 @@ namespace AI2_Backend.Controllers
             _accountService = accountService;
         }
 
-        [ProducesResponseType(typeof(UserProfileDto), StatusCodes.Status201Created)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [SwaggerOperation("Rejestracja nowego użytkownika.")]
+        [ProducesResponseType(typeof(RegisterUserCreatedResponse), StatusCodes.Status201Created)]
+        [SwaggerResponseExample(StatusCodes.Status201Created, typeof(RegisterUserCreatedResponse))]
+        [ProducesResponseType(typeof(ValidationExampleTemplate), StatusCodes.Status400BadRequest)]
         [SwaggerRequestExample(typeof(RegisterUserDto), typeof(RegisterUserDtoDefault))]
+        [SwaggerOperation("Rejestracja nowego użytkownika.")]
         [HttpPost("register")]
         public ActionResult ReqisterUser([FromBody] RegisterUserDto dto)
         {
@@ -33,8 +38,10 @@ namespace AI2_Backend.Controllers
             return Created(nameof(entity), entity);
         }
 
-        [ProducesResponseType(typeof(LoginUserDto), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(LoginUserUnsuccesfulResponse), StatusCodes.Status401Unauthorized)]
+        [SwaggerResponseExample(StatusCodes.Status401Unauthorized, typeof(LoginUserUnsuccesfulResponse))]
+        [ProducesResponseType(typeof(LoginUserSuccesfulResponse), StatusCodes.Status200OK)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(LoginUserSuccesfulResponse))]
         [SwaggerOperation("Logowanie do systemu.")]
         [SwaggerRequestExample(typeof(LoginUserDto), typeof(LoginUserDtoDefault))]
         [HttpPost("login")]
