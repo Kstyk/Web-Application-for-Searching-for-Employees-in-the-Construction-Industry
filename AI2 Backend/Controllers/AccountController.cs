@@ -58,9 +58,11 @@ namespace AI2_Backend.Controllers
             }
         }
 
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(UserUnauthorizedResponse),StatusCodes.Status401Unauthorized)]
+        [SwaggerResponseExample(StatusCodes.Status401Unauthorized, typeof(UserUnauthorizedResponse))]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ValidationProblemDetails),StatusCodes.Status400BadRequest)]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(ValidationUserEditErrorResponse))]
+        [ProducesResponseType(typeof(ValidationUserEditErrorResponse),StatusCodes.Status400BadRequest)]
         [SwaggerOperation("Edycja profilu.")]
         [SwaggerRequestExample(typeof(UpdateUserDto), typeof(UpdateUserDtoDefault))]
         [HttpPut("update")]
@@ -77,8 +79,10 @@ namespace AI2_Backend.Controllers
             }
         }
 
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(UserProfileDto),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(UserUnauthorizedResponse), StatusCodes.Status401Unauthorized)]
+        [SwaggerResponseExample(StatusCodes.Status401Unauthorized, typeof(UserUnauthorizedResponse))]
+        [ProducesResponseType(typeof(LoggedUserProfileResponse),StatusCodes.Status200OK)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(LoggedUserProfileResponse))]
         [HttpGet("my-profile")]
         [SwaggerOperation("Pobranie profilu zalogowanego użytkownika.")]
         [Authorize]
@@ -90,7 +94,8 @@ namespace AI2_Backend.Controllers
         }
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(UserUnauthorizedResponse), StatusCodes.Status401Unauthorized)]
+        [SwaggerResponseExample(StatusCodes.Status401Unauthorized, typeof(UserUnauthorizedResponse))]
         [HttpDelete("delete")]
         [SwaggerOperation("Usunięcie konta.")]
         [Authorize]

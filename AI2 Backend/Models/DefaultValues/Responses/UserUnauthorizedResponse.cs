@@ -2,11 +2,11 @@
 
 namespace AI2_Backend.Models.DefaultValues.Responses
 {
-    public class LoginUserUnsuccesfulResponse : IExamplesProvider<string>
+    public class UserUnauthorizedResponse : IExamplesProvider<string>
     {
         public string GetExamples()
         {
-            return "Incorrect login details.";
+            return "You're not logged in.";
         }
     }
 }
