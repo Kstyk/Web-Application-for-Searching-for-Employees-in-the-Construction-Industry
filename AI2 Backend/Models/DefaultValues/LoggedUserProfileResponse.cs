@@ -1,8 +1,10 @@
 ﻿using AI2_Backend.Entities;
+using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Filters;
 
-namespace AI2_Backend.Models.DefaultValues.Responses
+namespace AI2_Backend.Models.DefaultValues
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class LoggedUserProfileResponse : IExamplesProvider<MyProfileDto>
     {
         public MyProfileDto GetExamples()

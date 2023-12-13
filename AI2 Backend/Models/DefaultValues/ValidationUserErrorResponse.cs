@@ -1,8 +1,10 @@
 ﻿using Swashbuckle.AspNetCore.Filters;
-using static AI2_Backend.Models.DefaultValues.Responses.ValidationUserErrorResponse;
+using static AI2_Backend.Models.DefaultValues.ValidationUserErrorResponse;
+using Microsoft.AspNetCore.Mvc;
 
-namespace AI2_Backend.Models.DefaultValues.Responses
+namespace AI2_Backend.Models.DefaultValues
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class ValidationUserErrorResponse : IExamplesProvider<ValidationExampleTemplate>
     {
         public class ValidationExampleTemplate
@@ -11,12 +13,6 @@ namespace AI2_Backend.Models.DefaultValues.Responses
             public string Type { get; set; }
             public string Title { get; set; }
             public int Status { get; set; }
-
-
-            public ValidationExampleTemplate()
-            {
-
-            }
         }
 
         public ValidationExampleTemplate GetExamples()

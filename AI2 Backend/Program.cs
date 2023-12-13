@@ -19,6 +19,7 @@ using System.Text.Json.Serialization;
 using AI2_Backend.seeders;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using AI2_Backend.Models.DefaultValues;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +66,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.ExampleFilters();
+    c.DocumentFilter<SwaggerDocumentFilter>();
     c.EnableAnnotations();
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {

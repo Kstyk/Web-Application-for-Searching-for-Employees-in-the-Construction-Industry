@@ -1,7 +1,6 @@
 ﻿using AI2_Backend.Entities;
 using AI2_Backend.Models;
 using AI2_Backend.Models.DefaultValues;
-using AI2_Backend.Models.DefaultValues.Responses;
 using AI2_Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
 using System.Net;
-using static AI2_Backend.Models.DefaultValues.Responses.ValidationUserErrorResponse;
+using static AI2_Backend.Models.DefaultValues.ValidationUserErrorResponse;
 
 namespace AI2_Backend.Controllers
 {
