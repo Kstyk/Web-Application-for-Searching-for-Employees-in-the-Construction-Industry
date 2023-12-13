@@ -1,8 +1,10 @@
 ﻿using AI2_Backend.Models;
+using AI2_Backend.Models.DefaultValues;
 using AI2_Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace AI2_Backend.Controllers
 {
@@ -18,7 +20,8 @@ namespace AI2_Backend.Controllers
             _qualificationService = qualificationService;
         }
 
-        [ProducesResponseType(typeof(List<QualificationDto>), StatusCodes.Status200OK)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(ListOfQualificationsResponse))]
+        [ProducesResponseType(typeof(ListOfQualificationsResponse), StatusCodes.Status200OK)]
         [SwaggerOperation("Pobierz wszystkie branże.")]
         [HttpGet("")]
         public ActionResult<List<QualificationDto>> GetAllCategories()

@@ -20,8 +20,10 @@ namespace AI2_Backend.Controllers
             _employeeService = employeeService;
         }
 
-        [ProducesResponseType(typeof(UserProfileDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(LoggedUserProfileResponse), StatusCodes.Status200OK)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(LoggedUserProfileResponse))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(EmployeeNotFoundResponse))]
+        [ProducesResponseType(typeof(EmployeeNotFoundResponse), StatusCodes.Status404NotFound)]
         [SwaggerOperation("Pobierz profil pracownika po ID.")]
         [HttpGet("{employeeId}")]
         public ActionResult<UserProfileDto> GetUserProfile([FromRoute] int employeeId)
@@ -35,7 +37,8 @@ namespace AI2_Backend.Controllers
             return NotFound();
         }
 
-        [ProducesResponseType(typeof(IEnumerable<UserProfileDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ListOfEmployeesResponse), StatusCodes.Status200OK)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(ListOfEmployeesResponse))]
         [SwaggerOperation("Wyszukaj pracowników.")]
         [HttpGet("")]
         public ActionResult<IEnumerable<UserProfileDto>> GetAllEmployees([FromQuery] EmployeeQuery query)
