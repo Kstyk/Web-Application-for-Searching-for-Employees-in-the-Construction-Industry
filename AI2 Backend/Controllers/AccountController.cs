@@ -1,4 +1,5 @@
-﻿using AI2_Backend.Models;
+﻿using AI2_Backend.Entities;
+using AI2_Backend.Models;
 using AI2_Backend.Models.DefaultValues;
 using AI2_Backend.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -6,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
+using System.Net;
+using static AI2_Backend.Models.DefaultValues.ValidationUserErrorResponse;
 
 namespace AI2_Backend.Controllers
 {
@@ -21,10 +24,11 @@ namespace AI2_Backend.Controllers
             _accountService = accountService;
         }
 
-        [ProducesResponseType(typeof(UserProfileDto), StatusCodes.Status201Created)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [SwaggerOperation("Rejestracja nowego użytkownika.")]
+        [ProducesResponseType(typeof(RegisterUserCreatedResponse), StatusCodes.Status201Created)]
+        [SwaggerResponseExample(StatusCodes.Status201Created, typeof(RegisterUserCreatedResponse))]
+        [ProducesResponseType(typeof(ValidationExampleTemplate), StatusCodes.Status400BadRequest)]
         [SwaggerRequestExample(typeof(RegisterUserDto), typeof(RegisterUserDtoDefault))]
+        [SwaggerOperation("Rejestracja nowego użytkownika.")]
         [HttpPost("register")]
         public ActionResult ReqisterUser([FromBody] RegisterUserDto dto)
         {
@@ -33,8 +37,10 @@ namespace AI2_Backend.Controllers
             return Created(nameof(entity), entity);
         }
 
-        [ProducesResponseType(typeof(LoginUserDto), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(LoginUserUnsuccesfulResponse), StatusCodes.Status401Unauthorized)]
+        [SwaggerResponseExample(StatusCodes.Status401Unauthorized, typeof(LoginUserUnsuccesfulResponse))]
+        [ProducesResponseType(typeof(LoginUserSuccesfulResponse), StatusCodes.Status200OK)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(LoginUserSuccesfulResponse))]
         [SwaggerOperation("Logowanie do systemu.")]
         [SwaggerRequestExample(typeof(LoginUserDto), typeof(LoginUserDtoDefault))]
         [HttpPost("login")]
@@ -51,9 +57,11 @@ namespace AI2_Backend.Controllers
             }
         }
 
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(UserUnauthorizedResponse),StatusCodes.Status401Unauthorized)]
+        [SwaggerResponseExample(StatusCodes.Status401Unauthorized, typeof(UserUnauthorizedResponse))]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ValidationProblemDetails),StatusCodes.Status400BadRequest)]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(ValidationUserEditErrorResponse))]
+        [ProducesResponseType(typeof(ValidationUserEditErrorResponse),StatusCodes.Status400BadRequest)]
         [SwaggerOperation("Edycja profilu.")]
         [SwaggerRequestExample(typeof(UpdateUserDto), typeof(UpdateUserDtoDefault))]
         [HttpPut("update")]
@@ -70,8 +78,10 @@ namespace AI2_Backend.Controllers
             }
         }
 
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(UserProfileDto),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(UserUnauthorizedResponse), StatusCodes.Status401Unauthorized)]
+        [SwaggerResponseExample(StatusCodes.Status401Unauthorized, typeof(UserUnauthorizedResponse))]
+        [ProducesResponseType(typeof(LoggedUserProfileResponse),StatusCodes.Status200OK)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(LoggedUserProfileResponse))]
         [HttpGet("my-profile")]
         [SwaggerOperation("Pobranie profilu zalogowanego użytkownika.")]
         [Authorize]
@@ -83,7 +93,8 @@ namespace AI2_Backend.Controllers
         }
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(UserUnauthorizedResponse), StatusCodes.Status401Unauthorized)]
+        [SwaggerResponseExample(StatusCodes.Status401Unauthorized, typeof(UserUnauthorizedResponse))]
         [HttpDelete("delete")]
         [SwaggerOperation("Usunięcie konta.")]
         [Authorize]

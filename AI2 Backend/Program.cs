@@ -19,6 +19,7 @@ using System.Text.Json.Serialization;
 using AI2_Backend.seeders;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using AI2_Backend.Models.DefaultValues;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +51,15 @@ builder.Services.AddAuthentication(option =>
 });
 
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontendClient", builder =>
+        builder.AllowAnyMethod()
+            .AllowAnyHeader()
+            .WithOrigins("http://localhost:3000")
+        );
+});
+
 // Add services to the container.
 builder.Services.AddControllers().AddNewtonsoftJson(opt =>
 {
@@ -60,6 +70,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.ExampleFilters();
+    c.DocumentFilter<SwaggerDocumentFilter>();
     c.EnableAnnotations();
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
@@ -141,6 +152,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors("FrontendClient");
+
 
 app.UseHttpsRedirection();
 
