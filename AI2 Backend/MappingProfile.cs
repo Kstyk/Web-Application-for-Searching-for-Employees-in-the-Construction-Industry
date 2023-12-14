@@ -34,6 +34,11 @@ namespace AI2_Backend
                 .ForMember(dest => dest.UserExperiences, opt => opt.Condition(src => src?.UserPreferences?.IsVisibleExperience == true))
                 .ForMember(dest => dest.UserQualifications, opt => opt.Condition(src => src?.UserPreferences?.IsVisibleSkills == true));
 
+            CreateMap<InvitationRequestDto, InvitationHistory>()
+                .ForMember(dest => dest.Message, opt => opt.MapFrom(src => src.Body))
+                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Subject));
+               
+
 
         }
     }
