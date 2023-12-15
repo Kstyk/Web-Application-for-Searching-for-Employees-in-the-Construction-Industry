@@ -1,4 +1,5 @@
 ﻿using AI2_Backend.Entities;
+using AI2_Backend.Enums;
 using AI2_Backend.Models;
 using AutoMapper;
 
@@ -41,8 +42,19 @@ namespace AI2_Backend
            
             CreateMap<InvitationHistory, InvitationDto>()
                 .ForMember(dest => dest.EmployeeEmail, opt => opt.MapFrom(src => src.Employee.Email))
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.DateOfSending.ToString("dd.MM.yyyy HH:mm")));
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.DateOfSending.ToString("dd.MM.yyyy HH:mm")))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => MapInvitationStatusToString(src.Status)));
 
+        }
+        private string MapInvitationStatusToString(InvitationStatus status)
+        {
+            return status switch
+            {
+                InvitationStatus.NEW => "Nowe",
+                InvitationStatus.CANCEL => "Anulowane",
+                InvitationStatus.COMPLETED => "Odbyte",
+                _ => throw new ArgumentOutOfRangeException(nameof(status), status, "Nieprawidłowa wartość InvitationStatus"),
+            };
         }
     }
 }

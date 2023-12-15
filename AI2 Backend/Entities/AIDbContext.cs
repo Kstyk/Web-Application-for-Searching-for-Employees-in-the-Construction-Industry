@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AI2_Backend.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace AI2_Backend.Entities
 {
@@ -86,6 +87,8 @@ namespace AI2_Backend.Entities
                 .Property(e => e.Company)
                 .HasColumnType("text")
                 .HasMaxLength(255);
+            
+           
 
             modelBuilder.Entity<Experience>()
                 .Property(e => e.Company)
@@ -113,12 +116,15 @@ namespace AI2_Backend.Entities
                 .WithMany(u => u.SavedProfiles)
                 .HasForeignKey(uq => uq.RecruiterId)
                 .OnDelete(DeleteBehavior.Cascade);
-            
+
             modelBuilder.Entity<InvitationHistory>()
                 .HasOne(uq => uq.Recruiter)
                 .WithMany(u => u.InvitationsHistory)
-                .HasForeignKey(uq => uq.RecruiterId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .HasForeignKey(uq => uq.RecruiterId);
+
+            modelBuilder.Entity<InvitationHistory>()
+               .Property(e => e.Status)
+               .HasDefaultValue(InvitationStatus.NEW);
         }
 
 
