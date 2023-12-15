@@ -27,7 +27,11 @@ var builder = WebApplication.CreateBuilder(args);
 var authenticationSettings = new AuthenticationSettings();
 builder.Configuration.GetSection("Authentication").Bind(authenticationSettings);
 
+
+
+
 builder.Services.AddSingleton(authenticationSettings);
+builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 
 builder.Services.AddAuthentication(option =>
 {
@@ -109,6 +113,9 @@ builder.Services.AddDbContextPool<AIDbContext>(options =>
     var connectionString = builder.Configuration.GetConnectionString("Default");
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
+
+
+
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 builder.Services.AddScoped<IUserContextService, UserContextService>();
@@ -122,6 +129,7 @@ builder.Services.AddScoped<QualificationSeeder>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IQualificationService, QualificationService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // validators
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
