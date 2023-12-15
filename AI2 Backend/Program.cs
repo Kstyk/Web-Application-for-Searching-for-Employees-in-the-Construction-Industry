@@ -129,7 +129,7 @@ builder.Services.AddScoped<QualificationSeeder>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IQualificationService, QualificationService>();
-builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IInvitationSevice, InvitationService>();
 
 // validators
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();

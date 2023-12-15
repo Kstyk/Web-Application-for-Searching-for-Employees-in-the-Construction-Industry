@@ -1,4 +1,5 @@
-﻿using AI2_Backend.Models;
+﻿using AI2_Backend.Entities;
+using AI2_Backend.Models;
 using AI2_Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,15 +8,16 @@ using Microsoft.EntityFrameworkCore;
 namespace AI2_Backend.Controllers
 {
     [Route("api/")]
-    public class EmailController : ControllerBase
+    public class InvitationController : ControllerBase
     {
-        private readonly IEmailService _emailService;
+        private readonly IInvitationSevice _emailService;
+        private readonly IUserContextService _userContextService;
     
 
-        public EmailController(IEmailService emailService)
+        public InvitationController(IInvitationSevice emailService, IUserContextService userContextService)
         {
             _emailService = emailService;
-         
+            _userContextService = userContextService;
         }
 
         [HttpPost("invitation")]
@@ -40,6 +42,20 @@ namespace AI2_Backend.Controllers
             }
           
            
+        }
+
+        [HttpGet("invitations/{recruiterId}")]
+        [Authorize]
+        public ActionResult<List<InvitationHistory>> GetInvitations([FromRoute] int recruiterId)
+        {
+            var currentUserId = _userContextService.GetUserId;
+            if (currentUserId != recruiterId)
+            {
+                return Forbid("Brak autoryzacji"); 
+            }
+            var invitations = _emailService.GetInvitations(recruiterId);
+
+            return Ok(invitations);
         }
     }
 }

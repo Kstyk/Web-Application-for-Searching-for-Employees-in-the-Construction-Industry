@@ -38,7 +38,10 @@ namespace AI2_Backend
                 .ForMember(dest => dest.Message, opt => opt.MapFrom(src => src.Body))
                 .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Subject));
                
-
+           
+            CreateMap<InvitationHistory, InvitationDto>()
+                .ForMember(dest => dest.EmployeeEmail, opt => opt.MapFrom(src => src.Employee.Email))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.DateOfSending.ToString("dd.MM.yyyy HH:mm")));
 
         }
     }
