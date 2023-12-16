@@ -43,7 +43,7 @@ namespace AI2_Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Experiences");
+                    b.ToTable("Experiences", (string)null);
                 });
 
             modelBuilder.Entity("AI2_Backend.Entities.InvitationHistory", b =>
@@ -71,11 +71,6 @@ namespace AI2_Backend.Migrations
                     b.Property<int>("RecruiterId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Status")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(1000)
@@ -87,7 +82,7 @@ namespace AI2_Backend.Migrations
 
                     b.HasIndex("RecruiterId");
 
-                    b.ToTable("InvitationHistories");
+                    b.ToTable("InvitationHistories", (string)null);
                 });
 
             modelBuilder.Entity("AI2_Backend.Entities.Qualification", b =>
@@ -102,7 +97,7 @@ namespace AI2_Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Qualifications");
+                    b.ToTable("Qualifications", (string)null);
                 });
 
             modelBuilder.Entity("AI2_Backend.Entities.Role", b =>
@@ -117,7 +112,7 @@ namespace AI2_Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles");
+                    b.ToTable("Roles", (string)null);
                 });
 
             modelBuilder.Entity("AI2_Backend.Entities.SavedProfile", b =>
@@ -138,7 +133,7 @@ namespace AI2_Backend.Migrations
 
                     b.HasIndex("RecruiterId");
 
-                    b.ToTable("SavedProfiles");
+                    b.ToTable("SavedProfiles", (string)null);
                 });
 
             modelBuilder.Entity("AI2_Backend.Entities.Stats", b =>
@@ -160,7 +155,7 @@ namespace AI2_Backend.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("Stats");
+                    b.ToTable("Stats", (string)null);
                 });
 
             modelBuilder.Entity("AI2_Backend.Entities.User", b =>
@@ -207,7 +202,7 @@ namespace AI2_Backend.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("AI2_Backend.Entities.UserExperience", b =>
@@ -228,7 +223,7 @@ namespace AI2_Backend.Migrations
 
                     b.HasIndex("ExperienceId");
 
-                    b.ToTable("UserExperiences");
+                    b.ToTable("UserExperiences", (string)null);
                 });
 
             modelBuilder.Entity("AI2_Backend.Entities.UserPreferences", b =>
@@ -266,7 +261,7 @@ namespace AI2_Backend.Migrations
                     b.HasIndex("EmployeeId")
                         .IsUnique();
 
-                    b.ToTable("UserPreferences");
+                    b.ToTable("UserPreferences", (string)null);
                 });
 
             modelBuilder.Entity("AI2_Backend.Entities.UserQualification", b =>
@@ -281,7 +276,7 @@ namespace AI2_Backend.Migrations
 
                     b.HasIndex("QualificationId");
 
-                    b.ToTable("UserQualifications");
+                    b.ToTable("UserQualifications", (string)null);
                 });
 
             modelBuilder.Entity("AI2_Backend.Entities.InvitationHistory", b =>
@@ -293,7 +288,7 @@ namespace AI2_Backend.Migrations
                         .IsRequired();
 
                     b.HasOne("AI2_Backend.Entities.User", "Recruiter")
-                        .WithMany("InvitationsHistory")
+                        .WithMany()
                         .HasForeignKey("RecruiterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -312,7 +307,7 @@ namespace AI2_Backend.Migrations
                         .IsRequired();
 
                     b.HasOne("AI2_Backend.Entities.User", "Recruiter")
-                        .WithMany("SavedProfiles")
+                        .WithMany()
                         .HasForeignKey("RecruiterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -405,10 +400,6 @@ namespace AI2_Backend.Migrations
 
             modelBuilder.Entity("AI2_Backend.Entities.User", b =>
                 {
-                    b.Navigation("InvitationsHistory");
-
-                    b.Navigation("SavedProfiles");
-
                     b.Navigation("UserExperiences");
 
                     b.Navigation("UserPreferences");

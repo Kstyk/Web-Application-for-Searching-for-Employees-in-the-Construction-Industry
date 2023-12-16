@@ -123,8 +123,10 @@ namespace AI2_Backend.Entities
                 .HasForeignKey(uq => uq.RecruiterId);
 
             modelBuilder.Entity<InvitationHistory>()
-               .Property(e => e.Status)
-               .HasDefaultValue(InvitationStatus.NEW);
+                .Property(e => e.Status)
+                .HasColumnType("int");
+
+       
         }
 
 

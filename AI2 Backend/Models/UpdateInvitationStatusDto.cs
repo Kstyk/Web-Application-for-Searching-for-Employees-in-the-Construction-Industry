@@ -6,6 +6,6 @@ namespace AI2_Backend.Models
     public class UpdateInvitationStatusDto
     {
         [Required(ErrorMessage = "Pole 'Status' jest wymagane.")]
-        public InvitationStatus Status { get; set; }
+        public string Status { get; set; }
     }
 }

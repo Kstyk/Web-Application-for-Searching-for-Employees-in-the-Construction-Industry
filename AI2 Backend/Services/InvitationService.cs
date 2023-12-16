@@ -81,7 +81,7 @@ namespace AI2_Backend.Services
             }
 
 
-            invitation.Status = dto.Status;
+            var updatedInvitation = _mapper.Map(dto, invitation);
             _dbContext.SaveChanges();
 
             return true;

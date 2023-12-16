@@ -45,6 +45,11 @@ namespace AI2_Backend
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.DateOfSending.ToString("dd.MM.yyyy HH:mm")))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => MapInvitationStatusToString(src.Status)));
 
+            CreateMap<UpdateInvitationStatusDto, InvitationHistory>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => MapInvitationStatusToEnum(src.Status)));
+
+          
+
         }
         private string MapInvitationStatusToString(InvitationStatus status)
         {
@@ -53,6 +58,17 @@ namespace AI2_Backend
                 InvitationStatus.NEW => "Nowe",
                 InvitationStatus.CANCEL => "Anulowane",
                 InvitationStatus.COMPLETED => "Odbyte",
+                _ => throw new ArgumentOutOfRangeException(nameof(status), status, "Nieprawidłowa wartość InvitationStatus"),
+            };
+        }
+        private InvitationStatus MapInvitationStatusToEnum(string status)
+        {
+            status = status.ToLower();
+            return status switch
+            {
+                "Nowe" => InvitationStatus.NEW,
+                "Anulowane" => InvitationStatus.CANCEL,
+                "Odbyte" => InvitationStatus.COMPLETED,
                 _ => throw new ArgumentOutOfRangeException(nameof(status), status, "Nieprawidłowa wartość InvitationStatus"),
             };
         }

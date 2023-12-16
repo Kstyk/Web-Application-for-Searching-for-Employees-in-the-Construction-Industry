@@ -2,8 +2,8 @@
 {
     public enum InvitationStatus
     {
-        NEW,
-        CANCEL,
-        COMPLETED
+        NEW = 0,
+        CANCEL = 1,
+        COMPLETED = 2
     }
 }
