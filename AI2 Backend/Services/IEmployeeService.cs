@@ -7,5 +7,6 @@ namespace AI2_Backend.Services
     {
         UserProfileDto GetEmployeeProfile(int employeeId);
         PagedResult<UserProfileDto> GetAll(EmployeeQuery query);
+        bool SaveProfile(int employeeId);
     }
 }

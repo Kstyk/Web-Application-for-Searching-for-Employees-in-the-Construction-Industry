@@ -2,6 +2,7 @@
 using AI2_Backend.Models.DefaultValues;
 using AI2_Backend.Models.Queries;
 using AI2_Backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
@@ -46,6 +47,20 @@ namespace AI2_Backend.Controllers
             var employees = _employeeService.GetAll(query);
 
             return Ok(employees);
+        }
+
+        [HttpPost("{employeeId}")]
+        [Authorize]
+        public ActionResult SaveProfile([FromRoute] int employeeId)
+        {
+            var isSavedProfile = _employeeService.SaveProfile(employeeId);
+
+            if (!isSavedProfile)
+            {
+                return NoContent();
+            }
+
+            return Ok(new { Message = "Zapisałeś profil"});
         }
 
 

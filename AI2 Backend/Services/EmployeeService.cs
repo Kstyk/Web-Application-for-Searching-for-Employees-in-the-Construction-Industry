@@ -12,11 +12,13 @@ namespace AI2_Backend.Services
     {
         private AIDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IUserContextService _userContextService;
 
-        public EmployeeService(AIDbContext context, IMapper mapper)
+        public EmployeeService(AIDbContext context, IMapper mapper, IUserContextService userContextService)
         {
             _context = context;
             _mapper = mapper;
+            _userContextService = userContextService;
         }
 
         public UserProfileDto GetEmployeeProfile(int employeeId)
@@ -106,6 +108,29 @@ namespace AI2_Backend.Services
             var result = new PagedResult<UserProfileDto>(employeesDto, baseQuery.Count(), query.PageSize, query.PageNumber);
 
             return result;
+        }
+
+        public bool SaveProfile(int employeeId)
+        {
+            var myId = _userContextService.GetUserId;
+
+            var exists = _context.Users.Any(e => e.Id == employeeId);
+
+            if (!exists || myId is null)
+            {
+                return false;
+            }
+
+            var savedProfile = new SavedProfile
+            {
+                EmployeeId = employeeId,
+                RecruiterId = (int)myId,
+            };
+            _context.SavedProfiles.Add(savedProfile);
+            _context.SaveChanges();
+
+            return true;
+
         }
     }
 }
