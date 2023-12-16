@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using AI2_Backend.Entities;
 using AI2_Backend.Models;
 using AutoMapper;
+using AI2_Backend.Enums;
 
 namespace AI2_Backend.Services
 {
@@ -67,6 +68,23 @@ namespace AI2_Backend.Services
 
             var invitationsDto = _mapper.Map<List<InvitationDto>>(invitations);
             return invitationsDto;
+        }
+
+        public bool Update(int invitationId, UpdateInvitationStatusDto dto)
+        {
+            var invitation = _dbContext.InvitationHistories
+                    .FirstOrDefault(i => i.Id == invitationId);
+           
+            if (invitation is null)
+            {
+                return false;
+            }
+
+
+            invitation.Status = dto.Status;
+            _dbContext.SaveChanges();
+
+            return true;
         }
     }
 }

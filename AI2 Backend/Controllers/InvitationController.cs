@@ -57,5 +57,26 @@ namespace AI2_Backend.Controllers
 
             return Ok(invitations);
         }
+
+        [HttpPut("invitations/{invitationId}")]
+        [Authorize]
+        public ActionResult UpdateInvitationStatus([FromRoute] int invitationId, [FromBody] UpdateInvitationStatusDto updateDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var isUpdatedInvitation = _emailService.Update(invitationId, updateDto);
+
+            if (!isUpdatedInvitation)
+            {
+                return NotFound();
+            }
+
+            return Ok(new { Message = "Pomyślnie zaktualizowano status zaproszenia" });
+
+
+        }
+
     }
 }
