@@ -9,17 +9,18 @@ using Microsoft.EntityFrameworkCore;
 using AI2_Backend.Entities;
 using AI2_Backend.Models;
 using AutoMapper;
+using AI2_Backend.Enums;
 
 namespace AI2_Backend.Services
 {
-    public class EmailService : IEmailService
+    public class InvitationService : IInvitationSevice
     {
         private readonly SmtpSettings _smtpSettings;
         private readonly IUserContextService _userContextService;
         private readonly AIDbContext _dbContext;
         private readonly IMapper _mapper;
 
-        public EmailService(IOptions<SmtpSettings> smtpSettings, IUserContextService userContextService, AIDbContext context, IMapper mapper)
+        public InvitationService(IOptions<SmtpSettings> smtpSettings, IUserContextService userContextService, AIDbContext context, IMapper mapper)
         {
             _smtpSettings = smtpSettings.Value;
             _userContextService = userContextService;
@@ -56,6 +57,34 @@ namespace AI2_Backend.Services
             smtpClient.Send(email);
             smtpClient.Disconnect(true);
 
+        }
+        public List<InvitationDto> GetInvitations(int recruiterId)
+        {
+            var invitations = _dbContext.InvitationHistories
+                  .Include(i => i.Recruiter)
+                  .Include(i => i.Employee)
+                  .Where(i => i.RecruiterId == recruiterId)
+                  .ToList();
+
+            var invitationsDto = _mapper.Map<List<InvitationDto>>(invitations);
+            return invitationsDto;
+        }
+
+        public bool Update(int invitationId, UpdateInvitationStatusDto dto)
+        {
+            var invitation = _dbContext.InvitationHistories
+                    .FirstOrDefault(i => i.Id == invitationId);
+           
+            if (invitation is null)
+            {
+                return false;
+            }
+
+
+            var updatedInvitation = _mapper.Map(dto, invitation);
+            _dbContext.SaveChanges();
+
+            return true;
         }
     }
 }

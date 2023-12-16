@@ -1,4 +1,6 @@
-﻿namespace AI2_Backend.Entities
+﻿using AI2_Backend.Enums;
+
+namespace AI2_Backend.Entities
 {
     public class InvitationHistory
     {
@@ -11,6 +13,7 @@
         public User Employee { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
-
+        public InvitationStatus Status { get; set; } = InvitationStatus.NEW;
+        
     }
 }
