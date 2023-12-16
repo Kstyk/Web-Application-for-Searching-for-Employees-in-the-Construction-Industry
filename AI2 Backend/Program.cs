@@ -20,6 +20,7 @@ using AI2_Backend.seeders;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using AI2_Backend.Models.DefaultValues;
+using Newtonsoft.Json.Converters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,9 +62,8 @@ builder.Services.AddCors(options =>
 });
 
 // Add services to the container.
-builder.Services.AddControllers().AddNewtonsoftJson(opt =>
-{
-});
+builder.Services.AddControllers().AddJsonOptions(options =>
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
