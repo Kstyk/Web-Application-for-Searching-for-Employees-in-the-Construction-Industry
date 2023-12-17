@@ -15,7 +15,7 @@ const Profiles = Loadable(lazy(() => import('../views/profiles/Profiles')));
 const Profile = Loadable(lazy(() => import('../views/profiles/Profile')));
 const MyProfile = Loadable(lazy(() => import('../views/profiles/MyProfile')));
 const SavedProfiles = Loadable(lazy(() => import('../views/profiles/SavedProfiles')));
-const EditProfile = Loadable(lazy(() => import('../views/profiles/EditProfile')));
+// const EditProfile = Loadable(lazy(() => import('../views/profiles/EditProfile')));
 const SendMail = Loadable(lazy(() => import('../views/mails/SendMail')));
 const HistoryMails = Loadable(lazy(() => import('../views/mails/HistoryMails')));
 
@@ -30,7 +30,7 @@ const Router = [
       { path: '/saved_profiles', exact: true, element: <SavedProfiles /> },
       { path: '/profile', exact: true, element: <Profile /> },
       { path: '/my_profile', exact: true, element: <MyProfile /> },
-      { path: '/edit_profile', exact: true, element: <EditProfile /> },
+      // { path: '/edit_profile', exact: true, element: <EditProfile /> },
       { path: '/profile/:id', exact: true, element: <Profile /> },
       //{ path: '/edit_profile/:id', exact: true, element: <EditProfile /> },
       { path: '/mail_send/:id', exact: true, element: <SendMail /> },

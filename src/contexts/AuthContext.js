@@ -20,7 +20,6 @@ export const AuthProvider = ({ children }) => {
       const response = await api.post('/account/login', credentials);
 
       const token = 'Bearer ' + response.data;
-      console.log('Token:', token);
 
       localStorage.setItem('token', token);
 
@@ -45,12 +44,8 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await api.post('/account/register', userData);
 
-      const token = response.data;
-      console.log('Token:', token);
-
-      localStorage.setItem('token', token);
-
       setLoggedIn(true);
+      login(userData);
     } catch (error) {
       console.error('Registration failed:', error.message);
       throw error; 
