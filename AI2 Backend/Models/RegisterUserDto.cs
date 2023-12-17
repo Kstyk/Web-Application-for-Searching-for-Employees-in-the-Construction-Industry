@@ -8,13 +8,17 @@ namespace AI2_Backend.Models
         public string Password { get; set; }
         public string ConfirmPassword { get; set; }
         public int RoleId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
 
-        public RegisterUserDto(string email, string password, string confirmPassword, int roleId)
+        public RegisterUserDto(string email, string password, string confirmPassword, int roleId, string firstName, string lastName)
         {
             Email = email;
             Password = password;
             ConfirmPassword = confirmPassword;
             RoleId = roleId;
+            FirstName = firstName;
+            LastName = lastName;
         }
 
         public RegisterUserDto()

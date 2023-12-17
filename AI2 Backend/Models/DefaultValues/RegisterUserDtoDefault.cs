@@ -16,7 +16,9 @@ namespace AI2_Backend.Models.DefaultValues
                 Email = "adam@gmail.com",
                 Password = "1234",
                 ConfirmPassword = "1234",
-                RoleId = 1
+                RoleId = 1,
+                FirstName = "Adam",
+                LastName = "Głowacki"
             };
         }
 
