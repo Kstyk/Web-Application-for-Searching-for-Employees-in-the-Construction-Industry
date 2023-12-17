@@ -42,30 +42,18 @@ const Profile = () => {
     school: 'Politechnika Warszawska',
   };*/
 
-  const [userData, setUserData] = useState({
-    id: id,
-    roleId: 0,
-    email: '',
-    firstName: null,
-    lastName: null,
-    aboutMe: null,
-    education: null,
-    voivodeship: null,
-    requiredPayment: null,
-    userQualifications: null,
-    userExperiences: [],
-  });
+  const [userData, setUserData] = useState();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-        try {
-          const response = await api.get(`/employees/${id}`);
+      try {
+        const response = await api.get(`/employees/${id}`);
 
-          const user = response.data;
-          setUserData(user);
-        } catch (error) {
-          console.error('Error fetching user profile:', error.message);
-        }
+        const user = response.data;
+        setUserData(user);
+      } catch (error) {
+        console.error('Error fetching user profile:', error.message);
+      }
     };
     fetchUserProfile();
   }, [userData]);
@@ -92,18 +80,6 @@ const Profile = () => {
   const handleSendEmail = () => {
   };
 
-  const handleDeleteProfile = () => {
-    setDeleteModalOpen(true);
-  };
-
-  const handleConfirmDelete = () => {
-    navigate('/dashboard');
-  };
-
-  const handleCloseDeleteModal = () => {
-    setDeleteModalOpen(false);
-  };
-
 
   return (
     <div className="container mx-auto">
@@ -111,61 +87,55 @@ const Profile = () => {
         <CardHeader
           avatar={
             <Avatar>
-              {userData.firstName?.charAt(0)}
-              {userData.lastName?.charAt(0)}
+              {userData?.firstName ? userData?.firstName.charAt(0) : ''}
+              {userData?.lastName ? userData?.lastName.charAt(0) : ''}
             </Avatar>
           }
-          title={`${userData.firstName} ${userData.lastName}`}
-          subheader={`Województwo: ${userData.voivodeship}`}
+          title={`${userData?.firstName} ${userData?.lastName}`}
+          subheader={userData?.voivodeship ? `Województwo: ${userData?.voivodeship}` : ''}
           action={
             <div>
               <Button color='grey2'
-                onClick={() => toggleFavorite(userData.id)}>
-                {isFavorite(userData.id) ? (
+                onClick={() => toggleFavorite(userData?.id)}>
+                {isFavorite(userData?.id) ? (
                   <FavoriteIcon className="text-gray-600" />
                 ) : (
                   <FavoriteBorderIcon className="text-gray-600" />
                 )}
               </Button>
-              <Link href={`/edit_profile/${userData.id}`}>
-                <IconButton>
-                  <Edit />
-                </IconButton>
-              </Link>
-              <IconButton onClick={handleDeleteProfile}>
-                <Delete />
-              </IconButton>
             </div>
           }
         />
         <CardContent>
           <Typography variant="subtitle1" gutterBottom>
-            Informacje o użytkowniku:
+            Informacje o użytkowniku
           </Typography>
-          <Typography>Imię: {userData.firstName}</Typography>
-          <Typography>Nazwisko: {userData.lastName}</Typography>
-          <Typography>Email: {userData.email}</Typography>
-          <Typography>Interesujące zarobki: {userData.requiredPayment}</Typography>
-          <Typography>Specjalizacje: {userData.userQualifications}</Typography>
-          <Typography>Krótki opis: {userData.aboutMe}</Typography>
-          <Typography>Ukończona szkoła: {userData.education}</Typography>
+          <Typography>Imię: {userData?.firstName}</Typography>
+          <Typography>Nazwisko: {userData?.lastName}</Typography>
+          <Typography>Email: {userData?.email}</Typography>
+          {userData?.requiredPayment && <Typography>Interesujące zarobki: {userData?.requiredPayment}</Typography>}
+          {userData?.userQualifications.length > 0 && <Typography>Specjalizacje: {userData?.userQualifications.map(qualification => qualification.name).join(', ')}</Typography>}
+          {userData?.aboutMe && <Typography>Krótki opis: {userData?.aboutMe}</Typography>}
+          {userData?.education && <Typography>Ukończona szkoła: {userData?.education}</Typography>}
 
-          <div className="my-3">
-            <Typography variant="subtitle1" gutterBottom>
-              Doświadczenie:
-            </Typography>
-            {userData.userExperiences.map((experience) => (
-              <ExperienceItem
-                key={experience.id}
-                from={experience.experience.startYear}
-                to={experience.experience.endYear}
-                company={experience.experience.company}
-                description={experience.experience.description}
-              />
-            ))}
-          </div>
+          {userData?.userExperiences.length > 0 &&
+            <div className="my-3">
+              <Typography variant="subtitle1" gutterBottom>
+                Doświadczenie:
+              </Typography>
+              {userData.userExperiences.map((experience) => (
+                <ExperienceItem
+                  key={experience.id}
+                  from={experience.experience.startYear}
+                  to={experience.experience.endYear}
+                  company={experience.experience.company}
+                  description={experience.experience.description}
+                />
+              ))}
+            </div>
+          }
 
-          <Typography>Statystyki odwiedzin profilu:</Typography>
+          <Typography mt={3}>Statystyki odwiedzin profilu:</Typography>
           <ul>
             <li>Ostatni dzień: {lastDayLogins} razy</li>
             <li>Ostatni miesiąc: {lastMonthLogins} razy</li>
@@ -184,25 +154,6 @@ const Profile = () => {
           </Link>
         </div>
       </Card>
-      <Modal open={deleteModalOpen} onClose={handleCloseDeleteModal}>
-        <Box className="bg-white border border-gray-200 p-4 rounded-md text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <Typography variant="h6" gutterBottom>
-            Czy na pewno chcesz usunąć swój profil?
-          </Typography>
-          <div className="mt-4 flex justify-center space-x-4">
-            <Button
-              variant="contained"
-              color="info"
-              onClick={handleCloseDeleteModal}
-            >
-              Nie
-            </Button>
-            <Button color="red" variant="contained" onClick={handleConfirmDelete}>
-              Tak
-            </Button>
-          </div>
-        </Box>
-      </Modal>
     </div>
   );
 };
