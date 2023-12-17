@@ -38,10 +38,12 @@ namespace AI2_Backend.Entities
                 .IsRequired();
             modelBuilder.Entity<User>()
                 .Property(e => e.FirstName)
-                .HasMaxLength(255);
+                .HasMaxLength(255)
+                .IsRequired();
             modelBuilder.Entity<User>()
                 .Property(e => e.LastName)
-                .HasMaxLength(255);
+                .HasMaxLength(255)
+                .IsRequired();
             modelBuilder.Entity<User>()
                 .Property(e => e.AboutMe)
                 .HasColumnType("text")
