@@ -84,6 +84,17 @@ namespace AI2_Backend.Controllers
             return NoContent();
         }
 
+        [HttpGet("saved-profiles")]
+        [Authorize]
+        public ActionResult<List<SaveProfileDto>> GetSavedProfiles()
+        {
+            var savedProfiles = _employeeService.GetSavedProfiles();
+
+            return Ok(savedProfiles);
+        }
+
+
+
         
 
 

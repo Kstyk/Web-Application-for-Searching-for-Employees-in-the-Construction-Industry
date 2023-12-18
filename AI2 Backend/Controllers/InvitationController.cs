@@ -51,10 +51,11 @@ namespace AI2_Backend.Controllers
             var currentUserId = _userContextService.GetUserId;
             if (currentUserId != recruiterId)
             {
-                return Forbid("Brak autoryzacji"); 
+                return Unauthorized("Brak autoryzacji"); 
             }
-            var invitations = _emailService.GetInvitations(recruiterId);
 
+            var invitations = _emailService.GetInvitations(recruiterId);
+      
             return Ok(invitations);
         }
 

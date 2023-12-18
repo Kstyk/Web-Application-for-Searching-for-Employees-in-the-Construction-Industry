@@ -145,5 +145,25 @@ namespace AI2_Backend.Services
 
             return true;
         }
+
+        public List<SaveProfileDto> GetSavedProfiles()
+        {
+            var myId = _userContextService.GetUserId;
+
+            if (myId is null)
+            {
+                return new List<SaveProfileDto>();
+            }
+
+            var savedProfiles = _context.SavedProfiles
+                .Include(sp => sp.Employee)
+                .Where(sp => sp.RecruiterId == myId)
+                .ToList();
+
+            var savedProfilesDto = _mapper.Map<List<SaveProfileDto>>(savedProfiles);
+
+            return savedProfilesDto;
+        }
+
     }
 }
