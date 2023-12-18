@@ -12,11 +12,13 @@ namespace AI2_Backend.Services
     {
         private AIDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IUserContextService _userContextService;
 
-        public EmployeeService(AIDbContext context, IMapper mapper)
+        public EmployeeService(AIDbContext context, IMapper mapper, IUserContextService userContextService)
         {
             _context = context;
             _mapper = mapper;
+            _userContextService = userContextService;
         }
 
         public UserProfileDto GetEmployeeProfile(int employeeId)
@@ -107,5 +109,61 @@ namespace AI2_Backend.Services
 
             return result;
         }
+
+        public bool SaveProfile(int employeeId)
+        {
+            var myId = _userContextService.GetUserId;
+
+            var exists = _context.Users.Any(e => e.Id == employeeId);
+
+            if (!exists || myId is null)
+            {
+                return false;
+            }
+
+            var savedProfile = new SavedProfile
+            {
+                EmployeeId = employeeId,
+                RecruiterId = (int)myId,
+            };
+            _context.SavedProfiles.Add(savedProfile);
+            _context.SaveChanges();
+
+            return true;
+
+        }
+        public bool DeleteSavedProfile(int savedProfileId)
+        {
+            var myId = _userContextService.GetUserId;
+
+            var exists = _context.SavedProfiles.FirstOrDefault(e => e.Id == savedProfileId);
+
+            if (exists is null || myId is null) { return false; }
+
+            _context.SavedProfiles.Remove(exists); 
+            _context.SaveChanges();
+
+            return true;
+        }
+
+        public List<SaveProfileDto> GetSavedProfiles()
+        {
+            var myId = _userContextService.GetUserId;
+
+            if (myId is null)
+            {
+                return new List<SaveProfileDto>();
+            }
+
+            var savedProfiles = _context.SavedProfiles
+                .Include(sp => sp.Employee)
+                .Where(sp => sp.RecruiterId == myId)
+                .ToList();
+
+            var savedProfilesDto = _mapper.Map<List<SaveProfileDto>>(savedProfiles);
+
+            return savedProfilesDto;
+        }
+
     }
 }
