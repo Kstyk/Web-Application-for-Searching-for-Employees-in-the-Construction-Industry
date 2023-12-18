@@ -50,12 +50,7 @@ namespace AI2_Backend.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4")
                 .OldAnnotation("MySql:CharSet", "utf8mb4");
 
-            migrationBuilder.AddColumn<int>(
-                name: "Status",
-                table: "InvitationHistories",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
+       
         }
 
         /// <inheritdoc />
