@@ -2,6 +2,7 @@
 using AI2_Backend.Models.DefaultValues;
 using AI2_Backend.Models.Queries;
 using AI2_Backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
@@ -47,6 +48,54 @@ namespace AI2_Backend.Controllers
 
             return Ok(employees);
         }
+
+        [HttpPost("{employeeId}")]
+        [Authorize]
+        [SwaggerOperation(Summary = "Zapisz profil", Description = "Zapisuje profil pracownika.")]
+        [SwaggerResponse(200, "Profil zapisano pomyślnie", typeof(string))]
+        [SwaggerResponse(204, "Profil już istnieje")]
+        public ActionResult SaveProfile([FromRoute] int employeeId)
+        {
+            var isSavedProfile = _employeeService.SaveProfile(employeeId);
+
+            if (!isSavedProfile)
+            {
+                return NoContent();
+            }
+
+            return Ok(new { Message = "Zapisałeś profil"});
+        }
+
+        [HttpDelete("{savedProfileId}")]
+        [Authorize]
+        [SwaggerOperation(Summary = "Usuń zapisany profil")]
+        [SwaggerResponse(204, "Profil usunięto pomyślnie")]
+        [SwaggerResponse(401, "Brak uwierzytelnienia")]
+        [SwaggerResponse(404, "Nie znaleziono profilu")]
+        public ActionResult DeleteSavedProfile([FromRoute] int savedProfileId)
+        {
+           
+            var isDeleted = _employeeService.DeleteSavedProfile(savedProfileId);
+          
+            if (!isDeleted)
+            {
+                return NotFound();
+            }
+            return NoContent();
+        }
+
+        [HttpGet("saved-profiles")]
+        [Authorize]
+        public ActionResult<List<SaveProfileDto>> GetSavedProfiles()
+        {
+            var savedProfiles = _employeeService.GetSavedProfiles();
+
+            return Ok(savedProfiles);
+        }
+
+
+
+        
 
 
     }

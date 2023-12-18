@@ -48,7 +48,14 @@ namespace AI2_Backend
             CreateMap<UpdateInvitationStatusDto, InvitationHistory>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => MapInvitationStatusToEnum(src.Status)));
 
-          
+            CreateMap<SavedProfile, SaveProfileDto>()
+                .ForMember(dest => dest.EmployeeEmail, opt => opt.MapFrom(src => src.Employee.Email))
+                .ForMember(dest => dest.EmployeeFirstName, opt => opt.MapFrom(src => src.Employee.FirstName))
+                .ForMember(dest => dest.EmployeeLastName, opt => opt.MapFrom(src => src.Employee.LastName));
+     
+
+
+
 
         }
         private string MapInvitationStatusToString(InvitationStatus status)
