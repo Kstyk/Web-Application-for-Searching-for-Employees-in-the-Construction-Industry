@@ -15,7 +15,16 @@ namespace AI2_Backend.Models.DefaultValues
                 Education = "Ukończyłem Uniwersytet Warszawski",
                 Voivodeship = Voivodeship.mazowieckie,
                 RequiredPayment = 2500,
-                QualificationsToAdd = new List<int> { 1, 2, 3}
+                QualificationsToAdd = new List<int> { 1, 2, 3},
+                Experiences = new List<CreateExperienceDto> { 
+                    new CreateExperienceDto
+                    {
+                        StartYear = 2005,
+                        EndYear = 2006,
+                        Company = "ABC sp. z o.o.",
+                        Description = "Rok pracy na stanowisku brygadzisty"
+                    }
+                }
             };
         }
     }
