@@ -51,6 +51,9 @@ namespace AI2_Backend.Controllers
 
         [HttpPost("{employeeId}")]
         [Authorize]
+        [SwaggerOperation(Summary = "Zapisz profil", Description = "Zapisuje profil pracownika.")]
+        [SwaggerResponse(200, "Profil zapisano pomyślnie", typeof(string))]
+        [SwaggerResponse(204, "Profil już istnieje")]
         public ActionResult SaveProfile([FromRoute] int employeeId)
         {
             var isSavedProfile = _employeeService.SaveProfile(employeeId);
@@ -62,6 +65,26 @@ namespace AI2_Backend.Controllers
 
             return Ok(new { Message = "Zapisałeś profil"});
         }
+
+        [HttpDelete("{savedProfileId}")]
+        [Authorize]
+        [SwaggerOperation(Summary = "Usuń zapisany profil")]
+        [SwaggerResponse(204, "Profil usunięto pomyślnie")]
+        [SwaggerResponse(401, "Brak uwierzytelnienia")]
+        [SwaggerResponse(404, "Nie znaleziono profilu")]
+        public ActionResult DeleteSavedProfile([FromRoute] int savedProfileId)
+        {
+           
+            var isDeleted = _employeeService.DeleteSavedProfile(savedProfileId);
+          
+            if (!isDeleted)
+            {
+                return NotFound();
+            }
+            return NoContent();
+        }
+
+        
 
 
     }

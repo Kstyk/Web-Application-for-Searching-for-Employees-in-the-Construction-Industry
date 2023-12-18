@@ -132,5 +132,18 @@ namespace AI2_Backend.Services
             return true;
 
         }
+        public bool DeleteSavedProfile(int savedProfileId)
+        {
+            var myId = _userContextService.GetUserId;
+
+            var exists = _context.SavedProfiles.FirstOrDefault(e => e.Id == savedProfileId);
+
+            if (exists is null || myId is null) { return false; }
+
+            _context.SavedProfiles.Remove(exists); 
+            _context.SaveChanges();
+
+            return true;
+        }
     }
 }
