@@ -18,9 +18,9 @@ namespace AI2_Backend.Models.Validators
                                     .MaximumLength(10000).WithMessage("Opis pracy nie może być dłuższy niż 10000 znaków.");
 
             RuleFor(x => x.StartYear)
-            .LessThanOrEqualTo(x => x.EndYear).WithMessage("Rok rozpoczęcia pracy nie może być większy niż rok zakończenia pracy.");
+            .LessThanOrEqualTo(x => x.EndYear).When(x => x.EndYear.HasValue).WithMessage("Rok rozpoczęcia pracy nie może być większy niż rok zakończenia pracy.");
             RuleFor(x => x.EndYear)
-            .GreaterThanOrEqualTo(x => x.StartYear).WithMessage("Rok zakończenia pracy nie może być mniejszy niż rok rozpoczęcia pracy.");
+            .GreaterThanOrEqualTo(x => x.StartYear).When(x => x.EndYear.HasValue).WithMessage("Rok zakończenia pracy nie może być mniejszy niż rok rozpoczęcia pracy.");
         }
     }
 }
