@@ -29,8 +29,6 @@ var authenticationSettings = new AuthenticationSettings();
 builder.Configuration.GetSection("Authentication").Bind(authenticationSettings);
 
 
-
-
 builder.Services.AddSingleton(authenticationSettings);
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 
@@ -124,6 +122,7 @@ builder.Services.AddHttpContextAccessor();
 // seeders
 builder.Services.AddScoped<RoleSeeder>();
 builder.Services.AddScoped<QualificationSeeder>();
+builder.Services.AddScoped<UserSeeder>();
 
 // services
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -143,9 +142,11 @@ var app = builder.Build();
 var scope = app.Services.CreateScope();
 var roleSeeder = scope.ServiceProvider.GetRequiredService<RoleSeeder>();
 var qualificationSeeder = scope.ServiceProvider.GetRequiredService<QualificationSeeder>();
+var userSeeder = scope.ServiceProvider.GetRequiredService<UserSeeder>();
 
 roleSeeder.Seed();
 qualificationSeeder.Seed();
+userSeeder.Seed();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -54,11 +54,17 @@ namespace AI2_Backend.Controllers
         [SwaggerOperation(Summary = "Zapisz profil", Description = "Zapisuje profil pracownika.")]
         [SwaggerResponse(200, "Profil zapisano pomyślnie", typeof(string))]
         [SwaggerResponse(204, "Profil już istnieje")]
+        [SwaggerResponse(404, "Nie istnieje profil o takim ID")]
         public ActionResult SaveProfile([FromRoute] int employeeId)
         {
-            var isSavedProfile = _employeeService.SaveProfile(employeeId);
-
-            if (!isSavedProfile)
+            try
+            {
+                var isSavedProfile = _employeeService.SaveProfile(employeeId);
+                if (!isSavedProfile)
+                {
+                    return NotFound();
+                }
+            } catch(Exception)
             {
                 return NoContent();
             }

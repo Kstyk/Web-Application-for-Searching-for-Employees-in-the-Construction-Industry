@@ -16,7 +16,7 @@ namespace AI2_Backend.Models
         public Voivodeship? Voivodeship { get; set; }
         public decimal? RequiredPayment { get; set; }
         public ICollection<QualificationDto> UserQualifications { get; set; }
-        public ICollection<UserExperience> UserExperiences { get; set; } = new List<UserExperience>();
+        public ICollection<ExperienceDto> UserExperiences { get; set; } 
 
 
     }
