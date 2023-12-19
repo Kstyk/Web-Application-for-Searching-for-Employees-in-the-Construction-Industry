@@ -87,5 +87,33 @@ namespace AI2_Backend.Services
 
             return true;
         }
+        public List<InvitationEmployeeDto> GetEmployeeInvitations(int employeeId, InvitationStatus status)
+        {
+            var invitationsQuery = _dbContext.InvitationHistories
+                .Include(i => i.Recruiter)
+                .Include(i => i.Employee)
+                .Where(i => i.EmployeeId == employeeId);
+
+            if (Enum.IsDefined(typeof(InvitationStatus), status))
+            {
+                switch (status)
+                {
+                    case InvitationStatus.NEW:
+                        invitationsQuery = invitationsQuery.Where(i => i.Status == InvitationStatus.NEW);
+                        break;
+                    case InvitationStatus.COMPLETED:
+                        invitationsQuery = invitationsQuery.Where(i => i.Status == InvitationStatus.COMPLETED);
+                        break;
+                }
+            }
+
+            var invitations = invitationsQuery.ToList();
+
+            var invitationsDto = _mapper.Map<List<InvitationEmployeeDto>>(invitations);
+
+          
+
+            return invitationsDto;
+        }
     }
 }

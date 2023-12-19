@@ -87,5 +87,23 @@ namespace AI2_Backend.Controllers
 
         }
 
+        [HttpGet("invitations/employee/{employeeId}")]
+        public ActionResult<List<InvitationEmployeeDto>> GetEmployeeInvitations(int employeeId, [FromQuery] InvitationStatus status = InvitationStatus.NEW)
+        {
+            if (!Enum.IsDefined(typeof(InvitationStatus), status))
+            {
+                return BadRequest("Nieprawidłowa wartość 'status'");
+            }
+
+            var invitationsDto = _emailService.GetEmployeeInvitations(employeeId, status);
+
+            if (invitationsDto == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(invitationsDto);
+        }
+
     }
 }
