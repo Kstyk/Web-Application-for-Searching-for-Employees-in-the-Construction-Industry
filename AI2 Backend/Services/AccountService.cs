@@ -102,16 +102,24 @@ namespace AI2_Backend.Services
         public void UpdateUser(UpdateUserDto updateUserDto)
         {
             var userId = _userContextService.GetUserId;
-            var user = _context.Users.Include(u => u.UserExperiences).Include(u => u.Role).FirstOrDefault(u => u.Id == userId);
+            var user = _context.Users.Include(u => u.UserExperiences).Include(u => u.Role).Include(u=> u.UserPreferences).FirstOrDefault(u => u.Id == userId);
 
             if (user is null)
             {
                 throw new Exception();
             }
 
+            if (updateUserDto.UserPreferences != null && user.Role.Name.Equals("employee"))
+            {
+                var preferences = _mapper.Map<UpdateUserPreferencesDto, UserPreferences>(updateUserDto.UserPreferences, user.UserPreferences);
+                _context.UserPreferences.Update(preferences);
+            } else
+            {
+                updateUserDto.UserPreferences = null;
+            }
+
             if (updateUserDto.QualificationsToAdd != null && user.Role.Name.Equals("employee"))
             {
-                Console.WriteLine("here1");
                 _context.UserQualifications.Where(q => q.UserId == user.Id).ExecuteDelete();
 
                 var qualificationsToAdd = _context.Qualifications
@@ -124,10 +132,8 @@ namespace AI2_Backend.Services
                 }
             }
 
-            if (updateUserDto.Experiences != null && user.Role.Name.Equals("employee"))
+            if (updateUserDto.UserExperiences != null && user.Role.Name.Equals("employee"))
             {
-                Console.WriteLine("here2");
-
                 if (user.UserExperiences.Any())
                 {
                     foreach (var experience in user.UserExperiences)
@@ -136,7 +142,7 @@ namespace AI2_Backend.Services
                     }
                 } 
 
-                foreach (var experienceDto in updateUserDto.Experiences)
+                foreach (var experienceDto in updateUserDto.UserExperiences)
                 {
                     var experience = _mapper.Map<CreateExperienceDto, Experience>(experienceDto);
                     var userExperience = new UserExperience { EmployeeId = user.Id, Experience = experience };
@@ -157,6 +163,7 @@ namespace AI2_Backend.Services
             var userProfile = _mapper.Map<MyProfileDto>(_context.Users
                 .Include(q => q.UserQualifications).ThenInclude(u => u.Qualification)
                 .Include(q => q.UserExperiences).ThenInclude(u => u.Experience)
+                .Include(q => q.UserPreferences)
                 .FirstOrDefault(u => u.Id == userId));
 
             return userProfile;

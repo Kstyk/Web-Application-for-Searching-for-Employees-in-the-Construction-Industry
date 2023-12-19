@@ -16,6 +16,7 @@ namespace AI2_Backend.Models
         public decimal? RequiredPayment { get; set; }
         public ICollection<QualificationDto> UserQualifications { get; set; }
         public ICollection<ExperienceDto> UserExperiences { get; set; }
+        public UserPreferencesDto UserPreferences { get; set; }
 
     }
 }
