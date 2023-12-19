@@ -114,11 +114,9 @@ namespace AI2_Backend.Entities
                 .WithMany(u => u.InvitationsHistory)
                 .HasForeignKey(uq => uq.RecruiterId);
 
-            modelBuilder.Entity<InvitationHistory>()
-                .Property(e => e.Status)
-                .HasColumnType("int");
+            
 
-       
+
         }
 
 

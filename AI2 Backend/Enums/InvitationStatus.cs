@@ -1,9 +1,16 @@
-﻿namespace AI2_Backend.Enums
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace AI2_Backend.Enums
 {
     public enum InvitationStatus
     {
-        NEW = 0,
-        CANCEL = 1,
-        COMPLETED = 2
+        [Display(Name = "Nowe")]
+        NEW,
+
+        [Display(Name = "Anulowane")]
+        CANCEL,
+
+        [Display(Name = "Odbyte")]
+        COMPLETED,
     }
 }

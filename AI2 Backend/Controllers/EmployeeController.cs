@@ -94,7 +94,9 @@ namespace AI2_Backend.Controllers
 
         [HttpGet("saved-profiles")]
         [Authorize(Policy = "IsRecruiter")]
-        [SwaggerResponse(403, "Nie jesteś rekruterem")]
+        [SwaggerOperation(Summary = "Pobierz zapisane profile")]
+        [SwaggerResponse(200, "Pomyślnie pobrano zapisane profile", typeof(List<SaveProfileDto>))]
+        [SwaggerResponse(403, "Nie jesteś rekruterem", typeof(void))]
         public ActionResult<List<SaveProfileDto>> GetSavedProfiles()
         {
             var savedProfiles = _employeeService.GetSavedProfiles();

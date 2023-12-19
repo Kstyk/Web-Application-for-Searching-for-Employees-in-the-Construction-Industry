@@ -53,10 +53,16 @@ namespace AI2_Backend
             CreateMap<InvitationHistory, InvitationDto>()
                 .ForMember(dest => dest.EmployeeEmail, opt => opt.MapFrom(src => src.Employee.Email))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.DateOfSending.ToString("dd.MM.yyyy HH:mm")))
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => MapInvitationStatusToString(src.Status)));
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+
+            CreateMap<InvitationHistory, InvitationEmployeeDto>()
+              .ForMember(dest => dest.RecruiterEmail, opt => opt.MapFrom(src => src.Recruiter.Email))
+              .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.DateOfSending.ToString("dd.MM.yyyy HH:mm")))
+              .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+
 
             CreateMap<UpdateInvitationStatusDto, InvitationHistory>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => MapInvitationStatusToEnum(src.Status)));
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
 
             CreateMap<SavedProfile, SaveProfileDto>()
                 .ForMember(dest => dest.EmployeeEmail, opt => opt.MapFrom(src => src.Employee.Email))
@@ -68,26 +74,6 @@ namespace AI2_Backend
 
 
         }
-        private string MapInvitationStatusToString(InvitationStatus status)
-        {
-            return status switch
-            {
-                InvitationStatus.NEW => "Nowe",
-                InvitationStatus.CANCEL => "Anulowane",
-                InvitationStatus.COMPLETED => "Odbyte",
-                _ => throw new ArgumentOutOfRangeException(nameof(status), status, "Nieprawidłowa wartość InvitationStatus"),
-            };
-        }
-        private InvitationStatus MapInvitationStatusToEnum(string status)
-        {
-            status = status.ToLower();
-            return status switch
-            {
-                "Nowe" => InvitationStatus.NEW,
-                "Anulowane" => InvitationStatus.CANCEL,
-                "Odbyte" => InvitationStatus.COMPLETED,
-                _ => throw new ArgumentOutOfRangeException(nameof(status), status, "Nieprawidłowa wartość InvitationStatus"),
-            };
-        }
+     
     }
 }

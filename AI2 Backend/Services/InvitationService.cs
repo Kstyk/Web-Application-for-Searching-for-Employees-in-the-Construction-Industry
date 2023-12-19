@@ -47,6 +47,7 @@ namespace AI2_Backend.Services
             invitation.RecruiterId = userId ?? throw new Exception();
             invitation.EmployeeId = _dbContext.Users.FirstOrDefault(u => u.Email == inv.ToEmail)?.Id ?? throw new Exception("Nie znaleziono odbiorcy");
             invitation.Title = $"{inv.Company} - {inv.Subject}";
+            invitation.Status = InvitationStatus.NEW;
 
             _dbContext.InvitationHistories.Add(invitation);
             _dbContext.SaveChanges();
@@ -81,10 +82,38 @@ namespace AI2_Backend.Services
             }
 
 
-            var updatedInvitation = _mapper.Map(dto, invitation);
+            invitation.Status = dto.Status;
             _dbContext.SaveChanges();
 
             return true;
+        }
+        public List<InvitationEmployeeDto> GetEmployeeInvitations(int employeeId, InvitationStatus status)
+        {
+            var invitationsQuery = _dbContext.InvitationHistories
+                .Include(i => i.Recruiter)
+                .Include(i => i.Employee)
+                .Where(i => i.EmployeeId == employeeId);
+
+            if (Enum.IsDefined(typeof(InvitationStatus), status))
+            {
+                switch (status)
+                {
+                    case InvitationStatus.NEW:
+                        invitationsQuery = invitationsQuery.Where(i => i.Status == InvitationStatus.NEW);
+                        break;
+                    case InvitationStatus.COMPLETED:
+                        invitationsQuery = invitationsQuery.Where(i => i.Status == InvitationStatus.COMPLETED);
+                        break;
+                }
+            }
+
+            var invitations = invitationsQuery.ToList();
+
+            var invitationsDto = _mapper.Map<List<InvitationEmployeeDto>>(invitations);
+
+          
+
+            return invitationsDto;
         }
     }
 }
