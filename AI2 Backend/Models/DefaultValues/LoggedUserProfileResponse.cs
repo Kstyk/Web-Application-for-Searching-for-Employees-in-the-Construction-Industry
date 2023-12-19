@@ -20,7 +20,7 @@ namespace AI2_Backend.Models.DefaultValues
                 Education = "University of Budapest",
                 Voivodeship = Enums.Voivodeship.dolnośląskie,
                 RequiredPayment = 3500,
-                UserExperiences = new List<UserExperience>(),
+                UserExperiences = new List<ExperienceDto>(),
                 UserQualifications = new List<QualificationDto>()
             };
         }

@@ -1,4 +1,5 @@
-﻿using AI2_Backend.Enums;
+﻿using AI2_Backend.Entities;
+using AI2_Backend.Enums;
 
 namespace AI2_Backend.Models
 {
@@ -12,6 +13,7 @@ namespace AI2_Backend.Models
         public decimal? RequiredPayment { get; set; }
         public List<int>? QualificationsToAdd { get; set; } // Id branż do dodania
         public List<CreateExperienceDto>? Experiences { get; set; }
+        public UpdateUserPreferencesDto? UserPreferences { get; set; }
 
     }
 }

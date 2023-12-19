@@ -111,6 +111,7 @@ namespace AI2_Backend.Services
 
             if (updateUserDto.QualificationsToAdd != null && user.Role.Name.Equals("employee"))
             {
+                Console.WriteLine("here1");
                 _context.UserQualifications.Where(q => q.UserId == user.Id).ExecuteDelete();
 
                 var qualificationsToAdd = _context.Qualifications
@@ -125,6 +126,8 @@ namespace AI2_Backend.Services
 
             if (updateUserDto.Experiences != null && user.Role.Name.Equals("employee"))
             {
+                Console.WriteLine("here2");
+
                 if (user.UserExperiences.Any())
                 {
                     foreach (var experience in user.UserExperiences)
