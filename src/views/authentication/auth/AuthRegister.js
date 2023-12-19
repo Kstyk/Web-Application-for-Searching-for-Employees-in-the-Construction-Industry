@@ -48,7 +48,7 @@ const AuthRegister = ({ subtitle }) => {
         try {
             await authRegister(data);
         } catch (error) {
-            const errorsArray = Object.entries(error.response.data.errors).map(([field, messages]) => (
+            const errorsArray = Object.entries(error.response?.data.errors).map(([field, messages]) => (
                 messages[0]
             ));
     
