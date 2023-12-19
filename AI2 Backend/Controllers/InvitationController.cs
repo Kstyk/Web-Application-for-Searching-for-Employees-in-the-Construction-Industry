@@ -24,7 +24,11 @@ namespace AI2_Backend.Controllers
 
         [HttpPost("invitation")]
         [Authorize(Policy = "IsRecruiter")]
-        [SwaggerResponse(403, "Nie jesteś rekruterem")]
+        [SwaggerOperation(Summary = "Wysyłanie zaproszenia mailem")]
+        [SwaggerResponse(200, "Zaproszenie wysłane pomyślnie", typeof(void))]
+        [SwaggerResponse(400, "Wprowadzono niepoprawne dane", typeof(string))]
+        [SwaggerResponse(403, "Nie jesteś rekruterem", typeof(string))]
+        [SwaggerResponse(500, "Wystąpił błąd podczas wysyłania zaproszenia", typeof(string))]
         public ActionResult SendInvitation([FromForm] InvitationRequestDto inv)
         {
             if (inv == null || string.IsNullOrEmpty(inv.ToEmail) || string.IsNullOrEmpty(inv.Subject) || string.IsNullOrEmpty(inv.Body))
@@ -49,13 +53,15 @@ namespace AI2_Backend.Controllers
 
         [HttpGet("invitations/{recruiterId}")]
         [Authorize(Policy = "IsRecruiter")]
-        [SwaggerResponse(403, "Nie jesteś rekruterem")]
+        [SwaggerOperation(Summary = "Lista zaproszeń rekrutera")]
+        [SwaggerResponse(200, "Pomyślnie pobrano zaproszenia", typeof(List<InvitationHistory>))]
+        [SwaggerResponse(403, "Nie jesteś rekruterem", typeof(string))]
         public ActionResult<List<InvitationHistory>> GetInvitations([FromRoute] int recruiterId)
         {
             var currentUserId = _userContextService.GetUserId;
             if (currentUserId != recruiterId)
             {
-                return Unauthorized("Brak autoryzacji"); 
+                return Forbid("Brak autoryzacji"); 
             }
 
             var invitations = _emailService.GetInvitations(recruiterId);
@@ -65,6 +71,10 @@ namespace AI2_Backend.Controllers
 
         [HttpPut("invitations/{invitationId}")]
         [Authorize]
+        [SwaggerOperation(Summary ="Aktualizacja statusu zaproszenia")]
+        [SwaggerResponse(200, "Pomyślnie zaktualizowano status zaproszenia")]
+        [SwaggerResponse(400, "Nieprawidłowa wartość 'Status'", typeof(InvitationStatus))]
+        [SwaggerResponse(404, "Nie znaleziono zaproszenia")]
         public ActionResult UpdateInvitationStatus([FromRoute] int invitationId, [FromBody] UpdateInvitationStatusDto updateDto)
         {
             if (!ModelState.IsValid)
@@ -91,6 +101,10 @@ namespace AI2_Backend.Controllers
         }
 
         [HttpGet("invitations/employee/{employeeId}")]
+        [SwaggerOperation(Summary = "Lista zaproszeń pracownika")]
+        [SwaggerResponse(200, "Pomyślnie pobrano zaproszenia pracownika")]
+        [SwaggerResponse(400, "Nieprawidłowa wartość 'status'", typeof(string))]
+        [SwaggerResponse(404, "Nie znaleziono zaproszeń pracownika")]
         public ActionResult<List<InvitationEmployeeDto>> GetEmployeeInvitations(int employeeId, [FromQuery] InvitationStatus status = InvitationStatus.NEW)
         {
             if (!Enum.IsDefined(typeof(InvitationStatus), status))
