@@ -69,6 +69,7 @@ namespace AI2_Backend
                  .ForMember(dest => dest.EmployeeEmail, opt => opt.MapFrom(src => src.Employee.Email))
                  .ForMember(dest => dest.EmployeeFirstName, opt => opt.MapFrom(src => src.Employee.FirstName))
                  .ForMember(dest => dest.EmployeeLastName, opt => opt.MapFrom(src => src.Employee.LastName))
+                  .ForMember(dest => dest.ProfileId, opt => opt.MapFrom(src => src.Employee.Id))
                  .ForMember(dest => dest.Qualifications, opt => opt.MapFrom(src => src.Employee.UserQualifications));
 
        

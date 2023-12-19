@@ -10,27 +10,22 @@ namespace AI2_Backend.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<int>(
+            migrationBuilder.AddColumn<int>(
                 name: "Status",
                 table: "InvitationHistories",
                 type: "int",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "longtext")
-                .OldAnnotation("MySql:CharSet", "utf8mb4");
+                nullable: false
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
+            migrationBuilder.DropColumn(
                 name: "Status",
-                table: "InvitationHistories",
-                type: "longtext",
-                nullable: false,
-                oldClrType: typeof(int),
-                oldType: "int")
-                .Annotation("MySql:CharSet", "utf8mb4");
+                table: "InvitationHistories"
+            );
         }
+
     }
 }
