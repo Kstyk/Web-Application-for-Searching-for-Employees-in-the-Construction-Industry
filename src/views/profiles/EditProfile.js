@@ -18,6 +18,8 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import CloseIcon from '@mui/icons-material/Close';
 import { useForm, Controller } from 'react-hook-form';
+import { v4 as uuidv4 } from 'uuid';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const api = axios.create({
     baseURL: 'http://localhost:5072/api',
@@ -25,6 +27,7 @@ const api = axios.create({
 
 const EditProfile = ({ profile, onClose, onProfileEdited }) => {
     const [userData, setUserData] = useState(profile);
+    const [editingErrors, setEditingErrors] = useState([]);
     const [qualifications, setQualifications] = useState([]);
     const {
         control,
@@ -53,18 +56,20 @@ const EditProfile = ({ profile, onClose, onProfileEdited }) => {
         'zachodnioPomorskie',
     ];
 
-    const fetchQualification = async () => {
+    useEffect(() => {
+        const fetchQualification = async () => {
 
-        await api.get('/qualifications', {})
-            .then((res) => {
-                setQualifications(res.data);
-            })
-            .catch((err) => {
-                console.error('Error fetching qualification');
-            });
-    };
+            await api.get('/qualifications', {})
+                .then((res) => {
+                    setQualifications(res.data);
+                })
+                .catch((err) => {
+                    console.error('Error fetching qualification');
+                });
+        };
 
-    fetchQualification();
+        fetchQualification();
+    }, []);
 
     useEffect(() => {
         register('firstName', { required: 'To pole jest wymagane' });
@@ -77,6 +82,16 @@ const EditProfile = ({ profile, onClose, onProfileEdited }) => {
         register('qualificationsToAdd');
         register('userExperiences');
         register('userQualifications');
+
+        if (userData.userPreferences) {
+            register('userPreferences.isVisibleProfile');
+            register('userPreferences.isVisibleAboutMe');
+            register('userPreferences.isVisibleSkills');
+            register('userPreferences.isVisibleExperience');
+            register('userPreferences.isVisibleEducation');
+            register('userPreferences.isVisibleVoivodeship');
+            register('userPreferences.isVisibleRequiredPayment');
+        }
     }, [register]);
 
     useEffect(() => {
@@ -88,45 +103,68 @@ const EditProfile = ({ profile, onClose, onProfileEdited }) => {
         setValue('voivodeship', userData?.voivodeship || null);
         setValue('requiredPayment', userData?.requiredPayment || null);
         setValue('qualificationsToAdd', userData?.qualificationsToAdd || []);
-        setValue('userExperiences', userData?.userExperiences || []);
+        // setValue('userExperiences', userData?.userExperiences || []);
+        setValue('userExperiences', (userData?.userExperiences || []).map(experience => ({
+            ...experience,
+            endYear: experience.endYear === 0 ? null : experience.endYear,
+        })));
         setValue('userQualifications', userData?.userQualifications || []);
-    }, [userData, setUserData]);
 
-
-    const handleSwitchChange = (event) => {
-        const { name, checked } = event.target;
-        setUserData({
-            ...userData,
-            [name]: checked,
-        });
-    };
+        if (userData.userPreferences) {
+            setValue('userPreferences.isVisibleProfile', userData?.userPreferences?.isVisibleProfile);
+            setValue('userPreferences.isVisibleAboutMe', userData?.userPreferences?.isVisibleAboutMe);
+            setValue('userPreferences.isVisibleSkills', userData?.userPreferences?.isVisibleSkills);
+            setValue('userPreferences.isVisibleExperience', userData?.userPreferences?.isVisibleExperience);
+            setValue('userPreferences.isVisibleEducation', userData?.userPreferences?.isVisibleEducation);
+            setValue('userPreferences.isVisibleVoivodeship', userData?.userPreferences?.isVisibleVoivodeship);
+            setValue('userPreferences.isVisibleRequiredPayment', userData?.userPreferences?.isVisibleRequiredPayment);
+        }
+    }, []);
 
     const navigate = useNavigate();
     const onSubmit = async (data) => {
-        console.log(userData);
+        // console.log(userData);
         console.log(data);
         const updateUserProfile = async () => {
             try {
                 const token = localStorage.getItem('token');
 
-                const response = await api.put('/account/update', data, {
+                const response = await api.put('/account', data, {
                     headers: {
                         Authorization: `${token}`,
                     },
                 });
-                onProfileEdited(data)
+                onProfileEdited(data);
+                onClose();
             } catch (error) {
-                console.error('Error editing user profile:', error.message);
+                const errorMessages = Object.values(error.response?.data.errors || {}).flatMap(errorArray => errorArray);
+                // console.log(errorMessages);
+                setEditingErrors(errorMessages);
             }
 
         };
         updateUserProfile();
-        onClose();
     };
 
     const getFilteredOptions = (allOptions, selectedOptions) => {
         const selectedIds = selectedOptions.map((item) => item.id);
         return allOptions.filter((option) => !selectedIds.includes(option.id));
+    };
+
+    const handleSwitchChange = (fieldName) => {
+        setUserData((prevUserData) => {
+            const updatedPreferences = {
+                ...prevUserData.userPreferences,
+                [fieldName]: !prevUserData.userPreferences[fieldName],
+            };
+
+            setValue(`userPreferences.${fieldName}`, updatedPreferences[fieldName]);
+
+            return {
+                ...prevUserData,
+                userPreferences: updatedPreferences,
+            };
+        });
     };
 
     return (
@@ -148,17 +186,20 @@ const EditProfile = ({ profile, onClose, onProfileEdited }) => {
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Grid container spacing={3}>
                         <Grid item xs={12}>
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        name="isProfileVisible"
-                                        checked={userData.isProfileVisible}
-                                        onChange={handleSwitchChange}
-                                        color="primary"
-                                    />
-                                }
-                                label="Profil widoczny dla innych użytkowników"
-                            />
+                            {userData.roleId == 2 &&
+                                <FormControlLabel
+                                    control={
+                                        <Switch
+                                            name="isVisibleProfile"
+                                            checked={userData.userPreferences.isVisibleProfile}
+                                            onChange={() => handleSwitchChange('isVisibleProfile')}
+                                            color="primary"
+                                        />
+                                    }
+                                    label="Profil widoczny dla innych użytkowników"
+                                />
+                            }
+
                         </Grid>
                         <Grid item xs={12}>
                             <Controller
@@ -198,149 +239,283 @@ const EditProfile = ({ profile, onClose, onProfileEdited }) => {
                                 </Typography>
                             )}
                         </Grid>
-                        <Grid item xs={12}>
-                            <Controller
-                                name="userQualifications"
-                                control={control}
-                                render={({ field }) => (
-                                    <Autocomplete
-                                        {...field}
-                                        className="my-3"
-                                        multiple
-                                        id="tags-outlined"
-                                        options={getFilteredOptions(qualifications, field.value)}
-                                        getOptionLabel={(qualification) => qualification.name}
-                                        filterSelectedOptions
-                                        onChange={(event, newValue) => {
-                                            setValue('userQualifications', newValue);
-                                            setValue('qualificationsToAdd', newValue.map(item => item.id));
-                                        }}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                label="Kwalifikacje"
-                                                placeholder=""
-                                                variant="outlined"
+                        {userData.roleId == 2 &&
+                            <>
+                                <Grid item xs={12}>
+                                    <Controller
+                                        name="userQualifications"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Autocomplete
+                                                {...field}
+                                                className="my-3"
+                                                multiple
+                                                id="tags-outlined"
+                                                options={getFilteredOptions(qualifications, field.value)}
+                                                getOptionLabel={(qualification) => qualification.name}
+                                                filterSelectedOptions
+                                                onChange={(event, newValue) => {
+                                                    setValue('userQualifications', newValue);
+                                                    setValue('qualificationsToAdd', newValue.map(item => item.id));
+                                                }}
+                                                renderInput={(params) => (
+                                                    <TextField
+                                                        {...params}
+                                                        label="Kwalifikacje"
+                                                        placeholder=""
+                                                        variant="outlined"
+                                                    />
+                                                )}
                                             />
                                         )}
                                     />
-                                )}
-                            />
-
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Controller
-                                name="voivodeship"
-                                control={control}
-                                render={({ field }) => (
-                                    <Autocomplete
-                                        {...field}
-                                        options={voivodeships}
-                                        onChange={(event, newValue) => {
-                                            setValue('voivodeship', newValue);
-                                        }}
-                                        renderInput={(params) => (
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                name="isVisibleSkills"
+                                                checked={userData.userPreferences.isVisibleSkills}
+                                                onChange={() => handleSwitchChange('isVisibleSkills')}
+                                                color="primary"
+                                            />
+                                        }
+                                        label="Widoczne dla innych"
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Controller
+                                        name="voivodeship"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Autocomplete
+                                                {...field}
+                                                options={voivodeships}
+                                                onChange={(event, newValue) => {
+                                                    setValue('voivodeship', newValue);
+                                                }}
+                                                renderInput={(params) => (
+                                                    <TextField
+                                                        {...params}
+                                                        label="Województwo"
+                                                        variant="outlined"
+                                                        fullWidth
+                                                        helperText={errors.voivodeship && errors.voivodeship.message}
+                                                    />
+                                                )}
+                                            />
+                                        )}
+                                    />
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                name="isVisibleVoivodeship"
+                                                checked={userData.userPreferences.isVisibleVoivodeship}
+                                                onChange={() => handleSwitchChange('isVisibleVoivodeship')}
+                                                color="primary"
+                                            />
+                                        }
+                                        label="Widoczne dla innych"
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Controller
+                                        name="requiredPayment"
+                                        control={control}
+                                        render={({ field }) => (
                                             <TextField
-                                                {...params}
-                                                label="Województwo"
+                                                {...field}
+                                                label="Zarobki"
                                                 variant="outlined"
                                                 fullWidth
-                                                helperText={errors.voivodeship && errors.voivodeship.message}
+                                                type='number'
                                             />
                                         )}
                                     />
-                                )}
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        name="isDataVisible"
-                                        checked={userData.isDataVisible}
-                                        onChange={handleSwitchChange}
-                                        color="primary"
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                name="isVisibleRequiredPayment"
+                                                checked={userData.userPreferences.isVisibleRequiredPayment}
+                                                onChange={() => handleSwitchChange('isVisibleRequiredPayment')}
+                                                color="primary"
+                                            />
+                                        }
+                                        label="Widoczne dla innych"
                                     />
-                                }
-                                label="Widoczne dla innych"
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Controller
-                                name="requiredPayment"
-                                control={control}
-                                render={({ field }) => (
-                                    <TextField
-                                        {...field}
-                                        label="Zarobki"
-                                        variant="outlined"
-                                        fullWidth
-                                        type='number'
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Controller
+                                        name="aboutMe"
+                                        control={control}
+                                        defaultValue=""
+                                        render={({ field }) => (
+                                            <TextField
+                                                {...field}
+                                                label="Krótki opis"
+                                                variant="outlined"
+                                                fullWidth
+                                            />
+                                        )}
                                     />
-                                )}
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        name="isDataVisible"
-                                        checked={userData.isDataVisible}
-                                        onChange={handleSwitchChange}
-                                        color="primary"
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                name="isVisibleAboutMe"
+                                                checked={userData.userPreferences.isVisibleAboutMe}
+                                                onChange={() => handleSwitchChange('isVisibleAboutMe')}
+                                                color="primary"
+                                            />
+                                        }
+                                        label="Widoczne dla innych"
                                     />
-                                }
-                                label="Widoczne dla innych"
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Controller
-                                name="aboutMe"
-                                control={control}
-                                defaultValue=""
-                                render={({ field }) => (
-                                    <TextField
-                                        {...field}
-                                        label="Krótki opis"
-                                        variant="outlined"
-                                        fullWidth
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Controller
+                                        name="education"
+                                        control={control}
+                                        defaultValue=""
+                                        render={({ field }) => (
+                                            <TextField
+                                                {...field}
+                                                label="Ukończona szkoła"
+                                                variant="outlined"
+                                                fullWidth
+                                            />
+                                        )}
                                     />
-                                )}
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        name="isDataVisible"
-                                        checked={userData.isDataVisible}
-                                        onChange={handleSwitchChange}
-                                        color="primary"
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                name="isVisibleEducation"
+                                                checked={userData.userPreferences.isVisibleEducation}
+                                                onChange={() => handleSwitchChange('isVisibleEducation')}
+                                                color="primary"
+                                            />
+                                        }
+                                        label="Widoczne dla innych"
                                     />
-                                }
-                                label="Widoczne dla innych"
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Controller
-                                name="education"
-                                control={control}
-                                defaultValue=""
-                                render={({ field }) => (
-                                    <TextField
-                                        {...field}
-                                        label="Ukończona szkoła"
-                                        variant="outlined"
-                                        fullWidth
+                                </Grid>
+
+                                <Grid item xs={12}>
+                                    <Typography variant="h6">Doświadczenia zawodowe</Typography>
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                name="isVisibleExperience"
+                                                checked={userData.userPreferences.isVisibleExperience}
+                                                onChange={() => handleSwitchChange('isVisibleExperience')}
+                                                color="primary"
+                                            />
+                                        }
+                                        label="Widoczne dla innych"
                                     />
-                                )}
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        name="isDataVisible"
-                                        checked={userData.isDataVisible}
-                                        onChange={handleSwitchChange}
-                                        color="primary"
-                                    />
-                                }
-                                label="Widoczne dla innych"
-                            />
-                        </Grid>
+                                    {userData.userExperiences.map((experience, index) => (
+                                        <div key={index}>
+                                            <Grid container spacing={2} mt={2} mb={2}>
+                                                <Grid item xs={3}>
+                                                    <Controller
+                                                        name={`userExperiences[${index}].startYear`}
+                                                        control={control}
+                                                        render={({ field }) => (
+                                                            <TextField
+                                                                {...field}
+                                                                label="Rok rozpoczęcia"
+                                                                type="number"
+                                                                fullWidth
+                                                            />
+                                                        )}
+                                                    />
+                                                </Grid>
+                                                <Grid item xs={3}>
+                                                    <Controller
+                                                        name={`userExperiences[${index}].endYear`}
+                                                        control={control}
+                                                        render={({ field }) => (
+                                                            <TextField
+                                                                {...field}
+                                                                label="Rok zakończenia"
+                                                                type="number"
+                                                                fullWidth
+                                                            />
+                                                        )}
+                                                    />
+                                                </Grid>
+                                                <Grid item xs={5}>
+                                                    <Controller
+                                                        name={`userExperiences[${index}].company`}
+                                                        control={control}
+                                                        render={({ field }) => (
+                                                            <TextField
+                                                                {...field}
+                                                                label="Firma"
+                                                                fullWidth
+                                                            />
+                                                        )}
+                                                    />
+                                                </Grid>
+                                                <Grid item xs={1}>
+                                                    <DeleteIcon
+                                                        fullWidth
+                                                        style={{ height: '100%', cursor: 'pointer' }}
+                                                        variant="outlined"
+                                                        color="secondary"
+                                                        onClick={() => {
+                                                            setValue('userExperiences', userData.userExperiences.filter((_, i) => i !== index));
+                                                            setUserData((prevUserData) => {
+                                                                const updatedUserExperiences = [...prevUserData.userExperiences];
+                                                                updatedUserExperiences.splice(index, 1);
+
+                                                                return {
+                                                                    ...prevUserData,
+                                                                    userExperiences: updatedUserExperiences,
+                                                                };
+                                                            });
+                                                        }}
+                                                    // startIcon={< />}
+                                                    >
+                                                        Usuń
+                                                    </DeleteIcon>
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <Controller
+                                                        name={`userExperiences[${index}].description`}
+                                                        control={control}
+                                                        render={({ field }) => (
+                                                            <TextField
+                                                                {...field}
+                                                                label="Opis"
+                                                                multiline
+                                                                rows={4}
+                                                                fullWidth
+                                                            />
+                                                        )}
+                                                    />
+                                                </Grid>
+                                            </Grid>
+                                        </div>
+                                    ))}
+                                    {/* Przycisk do dodawania nowego doświadczenia */}
+                                    <div className='mt-3 text-center'>
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={() => {
+                                                setUserData((prevUserData) => ({
+                                                    ...prevUserData,
+                                                    userExperiences: [
+                                                        ...prevUserData.userExperiences,
+                                                        {
+                                                            id: uuidv4(), startYear: null, endYear: null, description: null, company: null
+                                                        }
+                                                    ],
+                                                }));
+                                            }}
+                                        >
+                                            Dodaj nowe doświadczenie
+                                        </Button>
+                                    </div>
+
+                                </Grid>
+                            </>}
                     </Grid>
                     {/* <Grid container justifyContent="flex-end">
                         <Grid item>
@@ -355,6 +530,16 @@ const EditProfile = ({ profile, onClose, onProfileEdited }) => {
                             </Link>
                         </Grid>
                     </Grid> */}
+                    {editingErrors && (
+                        <div className="text-center my-3">
+                            {editingErrors.map((error, index) => (
+                                <Typography key={index} variant="caption" color="error" style={{ display: 'block', width: '100%' }}>
+                                    {error}
+                                </Typography>
+                            ))}
+                        </div>
+                    )}
+
                     <DialogActions>
                         <Button onClick={onClose} size="medium" variant="outlined" color="primary">
                             Anuluj

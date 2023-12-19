@@ -23,10 +23,11 @@ const AuthLogin = ({ subtitle }) => {
   const [loginError, setLoginError] = useState(null);
 
   const onSubmit = async (data) => {
+    console.log(data);
     try {
       await login(data);
     } catch (error) {
-      setLoginError(error.response.data);
+      setLoginError(error.response?.data);
     }
   };
 
