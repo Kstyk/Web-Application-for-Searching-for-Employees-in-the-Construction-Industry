@@ -11,7 +11,8 @@ namespace AI2_Backend
         {
             CreateMap<RegisterUserDto, User>();
             CreateMap<UpdateUserDto, User>()
-                .ForMember(dest => dest.UserQualifications, opt => opt.Ignore());
+                .ForMember(dest => dest.UserQualifications, opt => opt.Ignore())
+                .ForMember(dest => dest.UserExperiences, opt => opt.Ignore());
 
             CreateMap<Qualification, QualificationDto>();
             CreateMap<UserQualification, QualificationDto>()

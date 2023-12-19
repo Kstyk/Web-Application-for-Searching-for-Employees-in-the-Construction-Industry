@@ -16,7 +16,7 @@ namespace AI2_Backend.Models.DefaultValues
                 Voivodeship = Voivodeship.mazowieckie,
                 RequiredPayment = 2500,
                 QualificationsToAdd = new List<int> { 1, 2, 3},
-                Experiences = new List<CreateExperienceDto> { 
+                UserExperiences = new List<CreateExperienceDto> { 
                     new CreateExperienceDto
                     {
                         StartYear = 2005,
@@ -24,6 +24,16 @@ namespace AI2_Backend.Models.DefaultValues
                         Company = "ABC sp. z o.o.",
                         Description = "Rok pracy na stanowisku brygadzisty"
                     }
+                },
+                UserPreferences = new UpdateUserPreferencesDto
+                {
+                    IsVisibleAboutMe = true,
+                    IsVisibleEducation = true,
+                    IsVisibleExperience = true,
+                    IsVisibleProfile = true,
+                    IsVisibleRequiredPayment = true,
+                    IsVisibleSkills = true,
+                    IsVisibleVoivodeship = true,
                 }
             };
         }
