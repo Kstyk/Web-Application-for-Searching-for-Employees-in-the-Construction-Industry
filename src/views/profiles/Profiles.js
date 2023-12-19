@@ -42,6 +42,7 @@ const Profiles = () => {
       await api.get('/employees', {})
         .then((res) => {
           if (Array.isArray(res.data.items)) {
+            // console.log(res.data);
             setProfilesData(res.data.items);
           } else {
             console.error('Invalid user data:', res.data.items);

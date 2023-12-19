@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Avatar,
@@ -16,9 +16,40 @@ import { IconListCheck, IconMail, IconUser } from '@tabler/icons';
 import ProfileImg from 'src/assets/images/profile/user-1.jpg';
 
 import { useAuth } from '../../../contexts/AuthContext';
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'http://localhost:5072/api',
+});
 
 const Profile = () => {
   const { isLoggedIn, logout } = useAuth();
+  const [userData, setUserData] = useState();
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (isLoggedIn) {
+        try {
+          const token = localStorage.getItem('token');
+
+          const response = await api.get('/account/my-profile', {
+            headers: {
+              Authorization: `${token}`,
+            },
+          });
+
+          const user = response.data;
+
+          setUserData(user);
+          console.log(user.roleId);
+
+        } catch (error) {
+          console.error('Error fetching user profile:', error.message);
+        }
+      }
+    };
+    fetchUserProfile();
+  }, [isLoggedIn]);
 
   const handleLogout = (e) => {
     e.preventDefault();
@@ -87,12 +118,14 @@ const Profile = () => {
           </ListItemIcon>
           <ListItemText>Mój profil</ListItemText>
         </MenuItem>
-        <MenuItem component={Link} to="/saved_profiles">
-          <ListItemIcon>
-            <IconMail width={20} />
-          </ListItemIcon>
-          <ListItemText>Zapisane profile</ListItemText>
-        </MenuItem>
+        {userData?.roleId == 1 &&
+          <MenuItem component={Link} to="/saved_profiles">
+            <ListItemIcon>
+              <IconMail width={20} />
+            </ListItemIcon>
+            <ListItemText>Zapisane profile</ListItemText>
+          </MenuItem>
+        }
         <MenuItem component={Link} to="/mail_history">
           <ListItemIcon>
             <IconListCheck width={20} />

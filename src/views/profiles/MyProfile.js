@@ -49,6 +49,8 @@ const Profile = () => {
           const user = response.data;
 
           setUserData(user);
+          console.log(user);
+
         } catch (error) {
           console.error('Error fetching user profile:', error.message);
         }
@@ -98,7 +100,7 @@ const Profile = () => {
   const handleConfirmDelete = async () => {
     const token = localStorage.getItem('token');
 
-    await api.delete('/account/delete', {
+    await api.delete('/account', {
       headers: {
         Authorization: `${token}`,
       },
@@ -172,11 +174,11 @@ const Profile = () => {
               </Typography>
               {userData?.userExperiences.map(experience => (
                 <ExperienceItem
-                  key={experience.id}
-                  from={experience.experience.startYear}
-                  to={experience.experience.endYear}
-                  company={experience.experience.company}
-                  description={experience.experience.description}
+                  key={experience?.id}
+                  from={experience?.startYear}
+                  to={experience?.endYear}
+                  company={experience?.company}
+                  description={experience?.description}
                 />
               ))}
             </div>
