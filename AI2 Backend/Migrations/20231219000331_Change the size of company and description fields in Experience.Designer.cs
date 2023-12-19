@@ -3,6 +3,7 @@ using System;
 using AI2_Backend.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AI2_Backend.Migrations
 {
     [DbContext(typeof(AIDbContext))]
-    partial class AIDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231219000331_Change the size of company and description fields in Experience")]
+    partial class ChangethesizeofcompanyanddescriptionfieldsinExperience
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,6 +34,7 @@ namespace AI2_Backend.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasMaxLength(10000)
                         .HasColumnType("varchar(10000)");
 

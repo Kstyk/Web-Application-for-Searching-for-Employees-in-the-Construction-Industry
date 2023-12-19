@@ -11,7 +11,7 @@ namespace AI2_Backend.Models
         public Voivodeship? Voivodeship { get; set; }
         public decimal? RequiredPayment { get; set; }
         public List<int>? QualificationsToAdd { get; set; } // Id branż do dodania
-        public List<CreateExperienceDto> Experiences { get; set; }
+        public List<CreateExperienceDto>? Experiences { get; set; }
 
     }
 }

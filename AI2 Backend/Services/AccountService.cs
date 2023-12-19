@@ -101,7 +101,7 @@ namespace AI2_Backend.Services
         public void UpdateUser(UpdateUserDto updateUserDto)
         {
             var userId = _userContextService.GetUserId;
-            var user = _context.Users.Include(u => u.UserExperiences).FirstOrDefault(u => u.Id == userId);
+            var user = _context.Users.Include(u => u.UserExperiences).Include(u => u.Role).FirstOrDefault(u => u.Id == userId);
 
             if (user is null)
             {

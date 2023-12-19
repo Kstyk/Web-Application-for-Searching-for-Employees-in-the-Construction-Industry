@@ -135,6 +135,7 @@ builder.Services.AddScoped<IInvitationSevice, InvitationService>();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 builder.Services.AddScoped<IValidator<UpdateUserDto>, UpdateUserDtoValidator>();
 builder.Services.AddScoped<IValidator<LoginUserDto>, LoginUserDtoValidator>();
+builder.Services.AddScoped<IValidator<CreateExperienceDto>, CreateExperienceDtoValidator>();
 
 var app = builder.Build();
 
