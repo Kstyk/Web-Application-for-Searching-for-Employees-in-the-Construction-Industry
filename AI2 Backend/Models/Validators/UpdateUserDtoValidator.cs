@@ -15,6 +15,8 @@ namespace AI2_Backend.Models.Validators
             RuleFor(x => x.Education).MaximumLength(10000).WithMessage("Opis wykształcenia nie może być dłuższy niż 10 000 znaków.");
             RuleFor(x => x.RequiredPayment).GreaterThan(0).WithMessage("Oczekiwana płaca musi być większa od zera.");
             RuleFor(x => x.Voivodeship).IsInEnum().WithMessage("Niepoprawne województwo");
+            RuleForEach(x => x.Experiences)
+            .SetValidator(new CreateExperienceDtoValidator(dbContext));
         }
     }
 }

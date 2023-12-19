@@ -21,7 +21,7 @@ namespace AI2_Backend.Entities
         public ICollection<InvitationHistory> InvitationsHistory { get; set; } = new List<InvitationHistory>();
         public virtual UserPreferences? UserPreferences { get; set; }
 
-        
+
 
     }
 }

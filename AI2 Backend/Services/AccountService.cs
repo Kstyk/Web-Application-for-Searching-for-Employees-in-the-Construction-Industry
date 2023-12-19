@@ -101,14 +101,14 @@ namespace AI2_Backend.Services
         public void UpdateUser(UpdateUserDto updateUserDto)
         {
             var userId = _userContextService.GetUserId;
-            var user = _context.Users.FirstOrDefault(u => u.Id == userId);
+            var user = _context.Users.Include(u => u.UserExperiences).Include(u => u.Role).FirstOrDefault(u => u.Id == userId);
 
             if (user is null)
             {
                 throw new Exception();
             }
 
-            if (updateUserDto.QualificationsToAdd != null)
+            if (updateUserDto.QualificationsToAdd != null && user.Role.Name.Equals("employee"))
             {
                 _context.UserQualifications.Where(q => q.UserId == user.Id).ExecuteDelete();
 
@@ -119,6 +119,24 @@ namespace AI2_Backend.Services
                 foreach (var qualification in qualificationsToAdd)
                 {
                     user.UserQualifications.Add(new UserQualification { UserId = user.Id, QualificationId = qualification.Id });
+                }
+            }
+
+            if (updateUserDto.Experiences != null && user.Role.Name.Equals("employee"))
+            {
+                if (user.UserExperiences.Any())
+                {
+                    foreach (var experience in user.UserExperiences)
+                    {
+                        _context.Experiences.Where(e => e.Id == experience.ExperienceId).ExecuteDelete();
+                    }
+                } 
+
+                foreach (var experienceDto in updateUserDto.Experiences)
+                {
+                    var experience = _mapper.Map<CreateExperienceDto, Experience>(experienceDto);
+                    var userExperience = new UserExperience { EmployeeId = user.Id, Experience = experience };
+                    user.UserExperiences.Add(userExperience);
                 }
             }
 

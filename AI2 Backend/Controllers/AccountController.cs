@@ -64,7 +64,7 @@ namespace AI2_Backend.Controllers
         [ProducesResponseType(typeof(ValidationUserEditErrorResponse),StatusCodes.Status400BadRequest)]
         [SwaggerOperation("Edycja profilu.")]
         [SwaggerRequestExample(typeof(UpdateUserDto), typeof(UpdateUserDtoDefault))]
-        [HttpPut("update")]
+        [HttpPut("")]
         [Authorize]
         public ActionResult UpdateUser([FromBody] UpdateUserDto dto) {
             try
@@ -95,7 +95,7 @@ namespace AI2_Backend.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(UserUnauthorizedResponse), StatusCodes.Status401Unauthorized)]
         [SwaggerResponseExample(StatusCodes.Status401Unauthorized, typeof(UserUnauthorizedResponse))]
-        [HttpDelete("delete")]
+        [HttpDelete("")]
         [SwaggerOperation("Usunięcie konta.")]
         [Authorize]
         public ActionResult DeleteAccount()

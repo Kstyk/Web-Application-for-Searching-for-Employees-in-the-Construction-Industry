@@ -90,17 +90,6 @@ namespace AI2_Backend.Entities
                 .HasColumnType("text")
                 .HasMaxLength(255);
             
-           
-
-            modelBuilder.Entity<Experience>()
-                .Property(e => e.Company)
-                .HasColumnType("text")
-                .HasMaxLength(255);
-
-            modelBuilder.Entity<Experience>()
-                .Property(e => e.Description)
-                .HasColumnType("text")
-                .HasMaxLength(2000);
 
             modelBuilder.Entity<UserExperience>()
                 .HasOne(uq => uq.Employee)
@@ -111,7 +100,8 @@ namespace AI2_Backend.Entities
             modelBuilder.Entity<UserExperience>()
                 .HasOne(uq => uq.Experience)
                 .WithMany(q => q.UserExperiences)
-                .HasForeignKey(uq => uq.ExperienceId);
+                .HasForeignKey(uq => uq.ExperienceId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<SavedProfile>()
                 .HasOne(uq => uq.Recruiter)
