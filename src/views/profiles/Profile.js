@@ -54,6 +54,7 @@ const Profile = () => {
         const response = await api.get(`/employees/${id}`);
 
         const user = response.data;
+        console.log(user);
         setUserData(user);
       } catch (error) {
         console.error('Error fetching user profile:', error.message);
@@ -64,40 +65,40 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchProfiles = async () => {
-        if (isLoggedIn) {
-            try {
-                const token = localStorage.getItem('token');
-    
-                const response = await api.get('/employees/saved-profiles', {
-                headers: {
-                    Authorization: `${token}`,
-                },
-                });
-    
-                if (Array.isArray(response.data) && response.data.length > 0) {
-                  const profiles = response.data.map(profile => {
-                    const { id } = profile;
-                    
-                    return {
-                      id,
-                    };
-                  });
-        
-                  setFavoriteProfiles(new Set(profiles.map(profile => profile.id)));
-                }
-            } catch (error) {
-                console.error('Error fetching user profile:', error.message);
-            }
+      if (isLoggedIn) {
+        try {
+          const token = localStorage.getItem('token');
+
+          const response = await api.get('/employees/saved-profiles', {
+            headers: {
+              Authorization: `${token}`,
+            },
+          });
+
+          if (Array.isArray(response.data) && response.data.length > 0) {
+            const profiles = response.data.map(profile => {
+              const { id } = profile;
+
+              return {
+                id,
+              };
+            });
+
+            setFavoriteProfiles(new Set(profiles.map(profile => profile.id)));
+          }
+        } catch (error) {
+          console.error('Error fetching user profile:', error.message);
         }
+      }
     };
     fetchProfiles();
-  }, []); 
+  }, []);
 
   const handleDeleteProfile = async (profileId) => {
     if (profileId) {
       try {
         const token = localStorage.getItem('token');
-  
+
         await api.delete(`/employees/${profileId}`, {
           headers: {
             Authorization: `${token}`,
@@ -114,9 +115,9 @@ const Profile = () => {
     if (profileId) {
       try {
         const token = localStorage.getItem('token');
-  
+
         await api.post(`/employees/${profileId}`, {
-          employeeId: profileId, 
+          employeeId: profileId,
         }, {
           headers: {
             Authorization: `${token}`,
@@ -183,28 +184,28 @@ const Profile = () => {
           <Typography>Nazwisko: {userData?.lastName}</Typography>
           <Typography>Email: {userData?.email}</Typography>
           {userData?.requiredPayment && <Typography>Interesujące zarobki: {userData?.requiredPayment}</Typography>}
-          {userData?.userQualifications.length > 0 && <Typography>Specjalizacje: {userData?.userQualifications.map(qualification => qualification.name).join(', ')}</Typography>}
+          {userData?.userQualifications && userData?.userQualifications.length > 0 && <Typography>Specjalizacje: {userData?.userQualifications.map(qualification => qualification.name).join(', ')}</Typography>}
           {userData?.aboutMe && <Typography>Krótki opis: {userData?.aboutMe}</Typography>}
           {userData?.education && <Typography>Ukończona szkoła: {userData?.education}</Typography>}
 
-          {userData?.userExperiences.length > 0 &&
+          {userData?.userExperiences && userData?.userExperiences.length > 0 &&
             <div className="my-3">
               <Typography variant="subtitle1" gutterBottom>
                 Doświadczenie:
               </Typography>
-              {userData.userExperiences.map((experience) => (
+              {userData?.userExperiences.map(experience => (
                 <ExperienceItem
-                  key={experience.id}
-                  from={experience.experience.startYear}
-                  to={experience.experience.endYear}
-                  company={experience.experience.company}
-                  description={experience.experience.description}
+                  key={experience?.id}
+                  from={experience?.startYear}
+                  to={experience?.endYear}
+                  company={experience?.company}
+                  description={experience?.description}
                 />
               ))}
             </div>
           }
 
-          <Typography mt={3}>Statystyki odwiedzin profilu:</Typography>
+          <Typography marginTop={3}>Statystyki odwiedzin profilu:</Typography>
           <ul>
             <li>Ostatni dzień: {lastDayLogins} razy</li>
             <li>Ostatni miesiąc: {lastMonthLogins} razy</li>
