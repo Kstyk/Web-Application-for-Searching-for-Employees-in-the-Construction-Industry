@@ -109,10 +109,13 @@ namespace AI2_Backend.Services
                 throw new Exception();
             }
 
-            if (updateUserDto.UserPreferences != null)
+            if (updateUserDto.UserPreferences != null && user.Role.Name.Equals("employee"))
             {
                 var preferences = _mapper.Map<UpdateUserPreferencesDto, UserPreferences>(updateUserDto.UserPreferences, user.UserPreferences);
                 _context.UserPreferences.Update(preferences);
+            } else
+            {
+                updateUserDto.UserPreferences = null;
             }
 
             if (updateUserDto.QualificationsToAdd != null && user.Role.Name.Equals("employee"))
@@ -160,6 +163,7 @@ namespace AI2_Backend.Services
             var userProfile = _mapper.Map<MyProfileDto>(_context.Users
                 .Include(q => q.UserQualifications).ThenInclude(u => u.Qualification)
                 .Include(q => q.UserExperiences).ThenInclude(u => u.Experience)
+                .Include(q => q.UserPreferences)
                 .FirstOrDefault(u => u.Id == userId));
 
             return userProfile;

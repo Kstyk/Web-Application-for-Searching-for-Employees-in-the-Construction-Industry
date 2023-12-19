@@ -37,6 +37,7 @@ namespace AI2_Backend
             CreateMap<CreateExperienceDto, Experience>();
 
             CreateMap<User, MyProfileDto>();
+            CreateMap<UserPreferences, UserPreferencesDto>();
             CreateMap<User, UserProfileDto>()
                 .ForMember(dest => dest.Voivodeship, opt => opt.Condition(src => src?.UserPreferences?.IsVisibleVoivodeship == true))
                 .ForMember(dest => dest.AboutMe, opt => opt.Condition(src => src?.UserPreferences?.IsVisibleAboutMe == true))
