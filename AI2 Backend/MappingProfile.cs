@@ -18,6 +18,14 @@ namespace AI2_Backend
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.QualificationId))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Qualification.Name));
 
+            CreateMap<UserExperience, ExperienceDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ExperienceId))
+                .ForMember(dest => dest.StartYear, opt => opt.MapFrom(src => src.Experience.StartYear))
+                .ForMember(dest => dest.EndYear, opt => opt.MapFrom(src => src.Experience.EndYear))
+                .ForMember(dest => dest.Company, opt => opt.MapFrom(src => src.Experience.Company))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Experience.Description));
+
+
             CreateMap<Experience, ExperienceDto>();
             CreateMap<UserExperience, ExperienceDto>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ExperienceId))

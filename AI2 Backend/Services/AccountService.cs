@@ -35,8 +35,9 @@ namespace AI2_Backend.Services
             newUser.Password = hashedPassword;
             _context.Users.Add(newUser);
 
-            if (dto.RoleId == 2) {
+            var role = _context.Roles.FirstOrDefault(q => q.Id == dto.RoleId);
 
+            if (role.Name.Equals("employee")) {
                 var userPrefs = new UserPreferences
                 {
                     Employee = newUser

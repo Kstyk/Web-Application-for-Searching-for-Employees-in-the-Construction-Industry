@@ -51,6 +51,7 @@ namespace AI2_Backend.Services
             var baseQuery = _context
                 .Users
                 .Include(q => q.UserQualifications).ThenInclude(u => u.Qualification)
+                .Include(q => q.UserExperiences).ThenInclude(u => u.Experience)
                 .Include(q => q.UserPreferences)
                 .Where(r => r.Role.Name == "employee" && r.UserPreferences.IsVisibleProfile == true);
 
@@ -114,7 +115,12 @@ namespace AI2_Backend.Services
         {
             var myId = _userContextService.GetUserId;
 
-            var exists = _context.Users.Any(e => e.Id == employeeId);
+            var exists = _context.Users.Any(e => e.Id == employeeId && e.Role.Name.Equals("employee"));
+
+            if (_context.SavedProfiles.Any(e => e.EmployeeId == employeeId && e.RecruiterId == myId))
+            {
+                throw new Exception();
+            }
 
             if (!exists || myId is null)
             {

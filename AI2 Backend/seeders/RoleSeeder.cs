@@ -31,7 +31,7 @@ namespace AI2_Backend.Seeders
             }
         }
 
-        private static IEnumerable<Role> GetRoles()
+        public static IEnumerable<Role> GetRoles()
         {
             var roles = new List<Role>() {
                 new Role() {
