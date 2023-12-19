@@ -21,6 +21,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using AI2_Backend.Models.DefaultValues;
 using Newtonsoft.Json.Converters;
+using AI2_Backend.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,6 +59,14 @@ builder.Services.AddCors(options =>
             .WithOrigins("http://localhost:3000")
         );
 });
+
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("IsRecruiter", builder => builder.AddRequirements(new RoleRequirement("recruiter")));
+    options.AddPolicy("IsEmployee", builder => builder.AddRequirements(new RoleRequirement("employee")));
+});
+builder.Services.AddScoped<IAuthorizationHandler, RoleRequirementHandler>();
 
 // Add services to the container.
 builder.Services.AddControllers().AddJsonOptions(options =>

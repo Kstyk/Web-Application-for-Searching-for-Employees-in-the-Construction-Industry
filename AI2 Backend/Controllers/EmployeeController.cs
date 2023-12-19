@@ -50,10 +50,11 @@ namespace AI2_Backend.Controllers
         }
 
         [HttpPost("{employeeId}")]
-        [Authorize]
+        [Authorize(Policy = "IsRecruiter")]
         [SwaggerOperation(Summary = "Zapisz profil", Description = "Zapisuje profil pracownika.")]
-        [SwaggerResponse(200, "Profil zapisano pomyślnie", typeof(string))]
+        [SwaggerResponse(200, "Profil zapisano pomyślnie")]
         [SwaggerResponse(204, "Profil już istnieje")]
+        [SwaggerResponse(403, "Nie jesteś rekruterem")]
         [SwaggerResponse(404, "Nie istnieje profil o takim ID")]
         public ActionResult SaveProfile([FromRoute] int employeeId)
         {
@@ -73,10 +74,11 @@ namespace AI2_Backend.Controllers
         }
 
         [HttpDelete("{savedProfileId}")]
-        [Authorize]
+        [Authorize(Policy = "IsRecruiter")]
         [SwaggerOperation(Summary = "Usuń zapisany profil")]
         [SwaggerResponse(204, "Profil usunięto pomyślnie")]
         [SwaggerResponse(401, "Brak uwierzytelnienia")]
+        [SwaggerResponse(403, "Nie jesteś rekruterem")]
         [SwaggerResponse(404, "Nie znaleziono profilu")]
         public ActionResult DeleteSavedProfile([FromRoute] int savedProfileId)
         {
@@ -91,18 +93,13 @@ namespace AI2_Backend.Controllers
         }
 
         [HttpGet("saved-profiles")]
-        [Authorize]
+        [Authorize(Policy = "IsRecruiter")]
+        [SwaggerResponse(403, "Nie jesteś rekruterem")]
         public ActionResult<List<SaveProfileDto>> GetSavedProfiles()
         {
             var savedProfiles = _employeeService.GetSavedProfiles();
 
             return Ok(savedProfiles);
         }
-
-
-
-        
-
-
     }
 }
