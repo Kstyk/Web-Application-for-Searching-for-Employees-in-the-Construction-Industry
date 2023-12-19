@@ -4,6 +4,7 @@ using AI2_Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace AI2_Backend.Controllers
 {
@@ -21,7 +22,8 @@ namespace AI2_Backend.Controllers
         }
 
         [HttpPost("invitation")]
-        [Authorize]
+        [Authorize(Policy = "IsRecruiter")]
+        [SwaggerResponse(403, "Nie jesteś rekruterem")]
         public ActionResult SendInvitation([FromForm] InvitationRequestDto inv)
         {
             if (inv == null || string.IsNullOrEmpty(inv.ToEmail) || string.IsNullOrEmpty(inv.Subject) || string.IsNullOrEmpty(inv.Body))
@@ -45,7 +47,8 @@ namespace AI2_Backend.Controllers
         }
 
         [HttpGet("invitations/{recruiterId}")]
-        [Authorize]
+        [Authorize(Policy = "IsRecruiter")]
+        [SwaggerResponse(403, "Nie jesteś rekruterem")]
         public ActionResult<List<InvitationHistory>> GetInvitations([FromRoute] int recruiterId)
         {
             var currentUserId = _userContextService.GetUserId;
