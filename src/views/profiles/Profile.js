@@ -19,11 +19,15 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ExperienceItem from './ExperienceItem';
 
+import { useAuth } from '../../contexts/AuthContext';
+
 const api = axios.create({
   baseURL: 'http://localhost:5072/api',
 });
 
 const Profile = () => {
+  const { isLoggedIn } = useAuth();
+
   const { id } = useParams();
   const navigate = useNavigate();
   const [favoriteProfiles, setFavoriteProfiles] = useState(new Set());
@@ -56,14 +60,83 @@ const Profile = () => {
       }
     };
     fetchUserProfile();
-  }, [userData]);
+  }, []);
+
+  useEffect(() => {
+    const fetchProfiles = async () => {
+        if (isLoggedIn) {
+            try {
+                const token = localStorage.getItem('token');
+    
+                const response = await api.get('/employees/saved-profiles', {
+                headers: {
+                    Authorization: `${token}`,
+                },
+                });
+    
+                if (Array.isArray(response.data) && response.data.length > 0) {
+                  const profiles = response.data.map(profile => {
+                    const { id } = profile;
+                    
+                    return {
+                      id,
+                    };
+                  });
+        
+                  setFavoriteProfiles(new Set(profiles.map(profile => profile.id)));
+                }
+            } catch (error) {
+                console.error('Error fetching user profile:', error.message);
+            }
+        }
+    };
+    fetchProfiles();
+  }, []); 
+
+  const handleDeleteProfile = async (profileId) => {
+    if (profileId) {
+      try {
+        const token = localStorage.getItem('token');
+  
+        await api.delete(`/employees/${profileId}`, {
+          headers: {
+            Authorization: `${token}`,
+          },
+        });
+
+      } catch (error) {
+        console.error('Error deleting profile:', error.message);
+      }
+    }
+  };
+
+  const handleAddToFavorites = async (profileId) => {
+    if (profileId) {
+      try {
+        const token = localStorage.getItem('token');
+  
+        await api.post(`/employees/${profileId}`, {
+          employeeId: profileId, 
+        }, {
+          headers: {
+            Authorization: `${token}`,
+          },
+        });
+
+      } catch (error) {
+        console.error('Error deleting profile:', error.message);
+      }
+    }
+  };
 
   const toggleFavorite = (profileId) => {
     const newFavoriteProfiles = new Set(favoriteProfiles);
     if (newFavoriteProfiles.has(profileId)) {
       newFavoriteProfiles.delete(profileId);
+      handleDeleteProfile(profileId);
     } else {
       newFavoriteProfiles.add(profileId);
+      handleAddToFavorites(profileId);
     }
     setFavoriteProfiles(newFavoriteProfiles);
   };
@@ -72,10 +145,6 @@ const Profile = () => {
 
   const lastDayLogins = 10;
   const lastMonthLogins = 100;
-
-  const handleAddToFavorites = () => {
-
-  };
 
   const handleSendEmail = () => {
   };

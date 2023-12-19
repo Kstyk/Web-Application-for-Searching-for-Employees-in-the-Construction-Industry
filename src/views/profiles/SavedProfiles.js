@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
 import {
   TextField,
   Button,
@@ -17,36 +19,87 @@ import {
 import Pagination from '@mui/lab/Pagination';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
+import { useAuth } from '../../contexts/AuthContext';
+
+const api = axios.create({
+    baseURL: 'http://localhost:5072/api',
+});
+
 const SavedProfiles = () => {
+  const { isLoggedIn } = useAuth();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
   const [filterCriteria, setFilterCriteria] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedProfile, setSelectedProfile] = useState(null);
+  const [sortedProfiles, setSortedProfiles] = useState([]);
+  const [filteredProfiles, setFilteredProfiles] = useState([]);
   const profilesPerPage = 10;
 
-  const [profilesData, setProfilesData] = useState([
-    { id: 1, name: 'Doe John', occupation: ['Developer'], email: 'john@example.com' },
-    { id: 5, name: 'Nowak Bob', occupation: ['Plumber'], email: 'nowak@example.com' },
-    { id: 2, name: 'Smith Jane', occupation: ['Designer', 'Manager'], email: 'jane@example.com' },
-  ]);
+/*{ id: 1, name: 'Doe John', occupation: ['Developer'], email: 'john@example.com' },
+  { id: 5, name: 'Nowak Bob', occupation: ['Plumber'], email: 'nowak@example.com' },
+  { id: 2, name: 'Smith Jane', occupation: ['Designer', 'Manager'], email: 'jane@example.com' },*/
+  const [profilesData, setProfilesData] = useState([]);
+
+  useEffect(() => {
+    const fetchProfiles = async () => {
+        if (isLoggedIn) {
+            try {
+                const token = localStorage.getItem('token');
+    
+                const response = await api.get('/employees/saved-profiles', {
+                headers: {
+                    Authorization: `${token}`,
+                },
+                });
+    
+                if (Array.isArray(response.data) && response.data.length > 0) {
+                  const profiles = response.data.map(profile => {
+                    const { id, employeeEmail, employeeFirstName, employeeLastName } = profile;
+                    
+                    return {
+                      id,
+                      email: employeeEmail,
+                      firstName: employeeFirstName,
+                      lastName: employeeLastName,
+                      name: `${employeeFirstName} ${employeeLastName}`,
+                      occupation: ["zawód"],
+                    };
+                  });
+        
+                  setProfilesData(profiles);
+                }
+            } catch (error) {
+                console.error('Error fetching user profile:', error.message);
+            }
+        }
+    };
+    fetchProfiles();
+  }, []); 
+
+  useEffect(() => {
+    console.log(profilesData[0]);
+    const filteredProfiles = Array.isArray(profilesData) ? profilesData.filter((profile) => {
+      if (filterCriteria === 'all' || profile.occupation.includes(filterCriteria)) {
+        return (
+          profile.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          profile.email.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
+      return false;
+    }) : [];
+
+    const sortedProfiles = [...filteredProfiles].sort((a, b) => {
+      const order = sortOrder === 'asc' ? 1 : -1;
+      return order * a.name.localeCompare(b.name);
+    });
+
+    setFilteredProfiles(filteredProfiles);
+    setSortedProfiles(sortedProfiles);
+  }, [profilesData, searchTerm, filterCriteria, sortOrder]);
 
   const [favoriteProfiles, setFavoriteProfiles] = useState(new Set());
-
-  const filteredProfiles = profilesData.filter((profile) => {
-    if (filterCriteria === 'all' || profile.occupation.includes(filterCriteria)) {
-      return (
-        profile.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        profile.email.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    return false;
-  });
-
-  const sortedProfiles = [...filteredProfiles].sort((a, b) => {
-    const order = sortOrder === 'asc' ? 1 : -1;
-    return order * a.name.localeCompare(b.name);
-  });
 
   const startIndex = (currentPage - 1) * profilesPerPage;
   const endIndex = startIndex + profilesPerPage;
@@ -71,7 +124,7 @@ const SavedProfiles = () => {
     setSelectedProfile(profile);
   };
 
-  const handleDeleteProfile = () => {
+  /*const handleDeleteProfile = () => {
     if (selectedProfile) {
       // Usuń użytkownika z listy
       setProfilesData((prevProfiles) =>
@@ -80,7 +133,32 @@ const SavedProfiles = () => {
       toggleFavorite(selectedProfile.id);
       setSelectedProfile(null);
     }
+  };*/
+
+  const handleDeleteProfile = async () => {
+    if (selectedProfile) {
+      try {
+        const token = localStorage.getItem('token');
+  
+        await api.delete(`/employees/${selectedProfile.id}`, {
+          headers: {
+            Authorization: `${token}`,
+          },
+        });
+  
+        setProfilesData((prevProfiles) =>
+          prevProfiles.filter((profile) => profile.id !== selectedProfile.id)
+        );
+  
+        toggleFavorite(selectedProfile.id);
+        setSelectedProfile(null);
+      } catch (error) {
+        console.error('Error deleting profile:', error.message);
+      }
+    }
   };
+
+  const uniqueOccupations = [...new Set(profilesData.flatMap((profile) => profile.occupation))];
 
   return (
     <div className="p-4">
@@ -96,9 +174,13 @@ const SavedProfiles = () => {
           onChange={(e) => setFilterCriteria(e.target.value)}
         >
           <MenuItem value="all">All</MenuItem>
-          <MenuItem value="Developer">Developer</MenuItem>
-          <MenuItem value="Designer">Designer</MenuItem>
-          <MenuItem value="Manager">Manager</MenuItem>
+            {
+              uniqueOccupations.map((occupation) => (
+                <MenuItem key={occupation} value={occupation}>
+                    {occupation}
+                </MenuItem>
+              ))
+            }
         </Select>
         <Button
           variant="contained"
@@ -114,7 +196,7 @@ const SavedProfiles = () => {
             <TableRow>
               <TableCell>LP</TableCell>
               <TableCell>Pracownik</TableCell>
-              <TableCell>Specjalność</TableCell>
+              { <TableCell>Specjalność</TableCell> }
               <TableCell>Email</TableCell>
               <TableCell>Link profilu</TableCell>
               <TableCell>Ulubione</TableCell>
@@ -122,10 +204,10 @@ const SavedProfiles = () => {
           </TableHead>
           <TableBody>
             {profilesToDisplay.map((profile, index) => (
-              <TableRow key={index + 1}>
+              <TableRow key={profile.id}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{profile.name}</TableCell>
-                <TableCell>{profile.occupation.join(', ')}</TableCell>
+                { <TableCell>{profile.occupation.join(', ')}</TableCell> }
                 <TableCell>{profile.email}</TableCell>
                 <TableCell>
                   <Link href={`/profile/${profile.id}`}>Zobacz profil</Link>
