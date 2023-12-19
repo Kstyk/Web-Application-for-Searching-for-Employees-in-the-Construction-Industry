@@ -67,6 +67,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+   
     c.ExampleFilters();
     //c.DocumentFilter<SwaggerDocumentFilter>();
     c.EnableAnnotations();
@@ -99,6 +100,7 @@ builder.Services.AddSwaggerGen(c =>
             new List<string>()
           }
         });
+   
 });
 builder.Services.AddSwaggerExamplesFromAssemblies(Assembly.GetEntryAssembly());
 

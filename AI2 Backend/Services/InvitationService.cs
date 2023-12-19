@@ -47,6 +47,7 @@ namespace AI2_Backend.Services
             invitation.RecruiterId = userId ?? throw new Exception();
             invitation.EmployeeId = _dbContext.Users.FirstOrDefault(u => u.Email == inv.ToEmail)?.Id ?? throw new Exception("Nie znaleziono odbiorcy");
             invitation.Title = $"{inv.Company} - {inv.Subject}";
+            invitation.Status = InvitationStatus.NEW;
 
             _dbContext.InvitationHistories.Add(invitation);
             _dbContext.SaveChanges();
@@ -81,7 +82,7 @@ namespace AI2_Backend.Services
             }
 
 
-            var updatedInvitation = _mapper.Map(dto, invitation);
+            invitation.Status = dto.Status;
             _dbContext.SaveChanges();
 
             return true;

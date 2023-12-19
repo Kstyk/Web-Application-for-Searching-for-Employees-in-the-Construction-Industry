@@ -1,4 +1,5 @@
 ﻿using AI2_Backend.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace AI2_Backend.Entities
 {
@@ -13,7 +14,9 @@ namespace AI2_Backend.Entities
         public User Employee { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
-        public InvitationStatus Status { get; set; } = InvitationStatus.NEW;
-        
+
+        [EnumDataType(typeof(InvitationStatus))]
+        public InvitationStatus Status { get; set; }
+
     }
 }

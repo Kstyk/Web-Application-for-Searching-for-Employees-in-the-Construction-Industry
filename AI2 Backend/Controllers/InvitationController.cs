@@ -1,4 +1,5 @@
 ﻿using AI2_Backend.Entities;
+using AI2_Backend.Enums;
 using AI2_Backend.Models;
 using AI2_Backend.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -67,6 +68,13 @@ namespace AI2_Backend.Controllers
             {
                 return BadRequest(ModelState);
             }
+
+            if (!Enum.IsDefined(typeof(InvitationStatus), updateDto.Status))
+            {
+                ModelState.AddModelError(nameof(updateDto.Status), "Nieprawidłowa wartość 'Status'");
+                return BadRequest(ModelState);
+            }
+
             var isUpdatedInvitation = _emailService.Update(invitationId, updateDto);
 
             if (!isUpdatedInvitation)
