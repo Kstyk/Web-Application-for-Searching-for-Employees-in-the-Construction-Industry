@@ -8,5 +8,6 @@ namespace AI2_Backend.Models
         public string EmployeeEmail { get; set; }
         public string EmployeeFirstName { get; set; }
         public string EmployeeLastName { get; set; }
+        public ICollection<QualificationDto> Qualifications { get; set; }
     }
 }

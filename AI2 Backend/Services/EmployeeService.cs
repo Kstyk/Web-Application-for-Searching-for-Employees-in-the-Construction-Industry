@@ -162,7 +162,7 @@ namespace AI2_Backend.Services
             }
 
             var savedProfiles = _context.SavedProfiles
-                .Include(sp => sp.Employee)
+                .Include(sp => sp.Employee).ThenInclude(e => e.UserQualifications).ThenInclude(q => q.Qualification)
                 .Where(sp => sp.RecruiterId == myId)
                 .ToList();
 

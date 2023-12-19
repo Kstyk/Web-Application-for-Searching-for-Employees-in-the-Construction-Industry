@@ -62,10 +62,10 @@ namespace AI2_Backend.Services
         public List<InvitationDto> GetInvitations(int recruiterId)
         {
             var invitations = _dbContext.InvitationHistories
-                  .Include(i => i.Recruiter)
-                  .Include(i => i.Employee)
-                  .Where(i => i.RecruiterId == recruiterId)
-                  .ToList();
+                     .Include(i => i.Recruiter)
+                     .Include(i => i.Employee)
+                     .Where(i => i.RecruiterId == recruiterId)
+                     .ToList();
 
             var invitationsDto = _mapper.Map<List<InvitationDto>>(invitations);
             return invitationsDto;
