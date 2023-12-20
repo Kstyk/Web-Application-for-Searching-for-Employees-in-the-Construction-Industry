@@ -39,6 +39,29 @@ namespace AI2_Backend.Services
 
                 var userProfile = _mapper.Map<UserProfileDto>(user);
 
+                var stats = _context.Stats
+                    .FirstOrDefault(u => u.Id == employeeId);
+                if (stats != null)
+                {
+                    userProfile.CounterDaily = stats.CounterDaily;
+                    userProfile.CounterMonthy = stats.CounterMonthly;
+                    stats.CounterDaily++;
+                    stats.CounterMonthly++;
+                    _context.Stats.Update(stats);
+                    _context.SaveChanges();
+
+                }
+                else
+                {
+                    stats = new Stats();
+                    stats.CounterMonthly = 1;
+                    stats.CounterDaily = 1;
+                    stats.EmployeeId = employeeId;
+                    _context.Stats.Add(stats);
+                    _context.SaveChanges();
+
+                }
+
 
                 return userProfile;
             }

@@ -17,6 +17,8 @@ namespace AI2_Backend.Models
         public ICollection<QualificationDto> UserQualifications { get; set; }
         public ICollection<ExperienceDto> UserExperiences { get; set; }
         public UserPreferencesDto UserPreferences { get; set; }
+        public int CounterDaily { get; set; }
+        public int CounterMonthy { get; set; } 
 
     }
 }

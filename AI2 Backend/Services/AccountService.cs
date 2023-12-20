@@ -166,6 +166,29 @@ namespace AI2_Backend.Services
                 .Include(q => q.UserPreferences)
                 .FirstOrDefault(u => u.Id == userId));
 
+            var stats = _context.Stats
+                .FirstOrDefault(u => u.Id == userId);
+            if (stats != null)
+            {
+                userProfile.CounterDaily = stats.CounterDaily;
+                userProfile.CounterMonthy = stats.CounterMonthly;
+                stats.CounterDaily++;
+                stats.CounterMonthly++;
+                _context.Stats.Update(stats);
+                _context.SaveChanges();
+
+            }
+            else
+            {
+                stats = new Stats();
+                stats.CounterMonthly = 0;
+                stats.CounterDaily = 0;
+                stats.EmployeeId = (int)userId;
+                _context.Stats.Add(stats);
+                _context.SaveChanges();
+
+            }
+
             return userProfile;
         }
 
