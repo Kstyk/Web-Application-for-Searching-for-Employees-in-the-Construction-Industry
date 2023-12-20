@@ -18,106 +18,165 @@ import {
 import Pagination from '@mui/lab/Pagination';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import { filter } from 'lodash';
 
 const api = axios.create({
   baseURL: 'http://localhost:5072/api',
 });
 
 const Profiles = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const profilesPerPage = 10;
-
   const [profilesData, setProfilesData] = useState([]);
   const [favoriteProfiles, setFavoriteProfiles] = useState(new Set());
+  const [qualifications, setQualifications] = useState([]);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
   const [filterCriteria, setFilterCriteria] = useState();
-  const [filteredProfiles, setFilteredProfiles] = useState([]);
-  const [qualifications, setQualifications] = useState([]);
 
-  useEffect(() => {
-    const fetchUserProfiles = async () => {
+  const profilesPerPage = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItemsCount, setTotalItemsCount] = useState(0);
+
+  const [selectedProfile, setSelectedProfile] = useState(null);
+  const [awfulMapping, setAwfulMapping] = useState();  // used because backend api doesnt delete fav profile based on profileId, but on id
+
+  const fetchProfiles = async () => {
+    try {
       const token = localStorage.getItem('token');
-
-      await api.get('/employees', {})
-        .then((res) => {
-          if (Array.isArray(res.data.items)) {
-            // console.log(res.data);
-            setProfilesData(res.data.items);
-          } else {
-            console.error('Invalid user data:', res.data.items);
-          }
-        })
-        .catch((err) => {
-          console.error('Error fetching user profile');
-
+  
+      const response = await api.get('/employees/saved-profiles', {
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
+  
+      if (Array.isArray(response.data) && response.data.length > 0) {
+        const profiles = response.data.map(profile => {
+          const { id, profileId } = profile;
+  
+          return {
+            id,
+            profileId,
+          };
         });
-    };
-    const fetchQualification = async () => {
-      // const token = localStorage.getItem('token');
-
-      await api.get('/qualifications', {})
-        .then((res) => {
-          // if (Array.isArray(res.data.items)) {
-          setQualifications(res.data);
-          // } else {
-          //   console.error('Invalid user data:', res.data.items);
-          // }
-        })
-        .catch((err) => {
-          console.error('Error fetching qualification');
-
-        });
-    };
-
-    fetchQualification();
-    fetchUserProfiles();
-  }, []);
+  
+        setFavoriteProfiles(new Set(profiles.map(profile => profile.profileId)));
+  
+        const idMap = new Map(profiles.map(profile => [profile.profileId, profile.id]));
+        setAwfulMapping(new Map(idMap));
+      }
+    } catch (error) {
+      console.error('Error fetching user profile:', error.message);
+    }
+  };
 
   useEffect(() => {
-    const updatedFilteredProfiles = profilesData.filter((profile) => {
-      const firstName = profile.firstName ? profile.firstName.toLowerCase() : '';
-      const lastName = profile.lastName ? profile.lastName.toLowerCase() : '';
-      const email = profile.email ? profile.email.toLowerCase() : '';
+    fetchProfiles();
+  }, []);
+  
 
-      const fullName = firstName + ' ' + lastName;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch qualifications
+        const qualificationsResponse = await api.get('/qualifications', {});
+        setQualifications(qualificationsResponse.data);
 
-      if (!filterCriteria || (profile.userQualifications && profile.userQualifications.some(qualification => qualification.name.includes(filterCriteria)))) {
-        return (
-          fullName.includes(searchTerm.toLowerCase()) ||
-          email.includes(searchTerm.toLowerCase())
-        );
+        console.log(filterCriteria);
+
+        // Fetch user profiles
+        const profilesResponse = await api.get('/employees', {
+          params: {
+            itemsFrom: (currentPage - 1) * profilesPerPage + 1,
+            itemsTo: currentPage * profilesPerPage,
+            pageNumber: currentPage,
+            sortDirection: sortOrder,
+            searchText: searchTerm,
+            qualificationId: filterCriteria
+          },
+        });
+        if (Array.isArray(profilesResponse.data.items)) {
+          setProfilesData(profilesResponse.data.items);
+
+          setTotalItemsCount(profilesResponse.data.totalItemsCount);
+          console.log(totalItemsCount);
+        } else {
+          console.error('Invalid user data:', profilesResponse.data.items);
+        }
+      } catch (error) {
+        console.error('Error fetching data from the backend:', error);
       }
-      return false;
-    });
-    setFilteredProfiles(updatedFilteredProfiles);
-  }, [profilesData, filterCriteria, searchTerm]);
-
-  const sortedProfiles = [...filteredProfiles].sort((a, b) => {
-    const order = sortOrder === 'asc' ? 1 : -1;
-    return order * (a.firstName + ' ' + a.lastName).localeCompare(b.firstName + ' ' + b.lastName);
-  });
-
-  const startIndex = (currentPage - 1) * profilesPerPage;
-  const endIndex = startIndex + profilesPerPage;
-
-  const profilesToDisplay = sortedProfiles.slice(startIndex, endIndex);
-
-  const handlePageChange = (event, value) => {
-    setCurrentPage(value);
-  };
+    };
+  
+    fetchData(); 
+  }, [currentPage, searchTerm, sortOrder, filterCriteria]);
 
   const toggleFavorite = (profileId) => {
     const newFavoriteProfiles = new Set(favoriteProfiles);
     if (newFavoriteProfiles.has(profileId)) {
       newFavoriteProfiles.delete(profileId);
+      handleDeleteProfile(profileId);
     } else {
       newFavoriteProfiles.add(profileId);
+      handleAddToFavorites(profileId);
     }
     setFavoriteProfiles(newFavoriteProfiles);
   };
 
+  //const handleDeleteConfirmation = (profile) => {
+  //  setSelectedProfile(profile);
+  //};
+
+  const handleAddToFavorites = async (profileId) => {
+    if (profileId) {
+      try {
+        const token = localStorage.getItem('token');
+
+        await api.post(`/employees/${profileId}`, {
+          employeeId: profileId,
+        }, {
+          headers: {
+            Authorization: `${token}`,
+          },
+        });
+
+        fetchProfiles();
+
+      } catch (error) {
+        console.error('Error deleting profile:', error.message);
+      }
+    }
+  };
+
+  const handleDeleteProfile = async (profileId) => {
+    if (profileId) {
+      try {
+        const token = localStorage.getItem('token');
+  
+        await api.delete(`/employees/${awfulMapping.get(profileId)}`, {
+          headers: {
+            Authorization: `${token}`,
+          },
+        });  
+  
+        setProfilesData((prevProfiles) =>
+          prevProfiles.filter((profile) => profile.profileId !== profileId)
+        );
+  
+        //toggleFavorite(profileId);
+        //setSelectedProfile(null);
+        fetchProfiles();
+      } catch (error) {
+        console.error('Error deleting profile:', error.message);
+      }
+    }
+  };
+
   const isFavorite = (profileId) => favoriteProfiles.has(profileId);
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
 
   return (
     <div className="p-4">
@@ -127,13 +186,21 @@ const Profiles = () => {
           className="w-1/4"
           label="Szukaj"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            setSearchTerm(e.target.value)
+            handlePageChange(null, 1); 
+          }}
         />
         <Autocomplete
           className="w-1/4"
           value={filterCriteria}
-          onChange={(event, newValue) => setFilterCriteria(newValue)}
-          options={[...qualifications.map((qualification) => qualification.name)]}
+          onChange={(e, newValue) => {
+            setFilterCriteria(newValue ? newValue.id : null);
+            handlePageChange(null, 1); 
+          }}
+          options={qualifications}
+          getOptionLabel={(option) => option.name}
+          getOptionValue={(option) => option.id}
           renderInput={(params) => (
             <TextField {...params} label="Wybierz kwalifikację" />
           )}
@@ -159,7 +226,8 @@ const Profiles = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {profilesToDisplay.map((profile, index) => (
+            {profilesData && profilesData.length > 0 ? (
+            profilesData.map((profile, index) => (
               <TableRow key={index + 1}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{`${profile.firstName} ${profile.lastName}`}</TableCell>
@@ -192,12 +260,16 @@ const Profiles = () => {
                   </Button>
                 </TableCell>
               </TableRow>
-            ))}
+            ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6}>No profiles found.</TableCell>
+              </TableRow>)}
           </TableBody>
         </Table>
       </TableContainer>
       <Pagination
-        count={Math.ceil(filteredProfiles.length / profilesPerPage)}
+        count={Math.ceil(totalItemsCount / profilesPerPage)}
         page={currentPage}
         onChange={handlePageChange}
         className="mt-4"

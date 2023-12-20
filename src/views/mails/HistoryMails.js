@@ -114,8 +114,8 @@ const HistoryMails = () => {
                             const receivedMails = mailsResponse.data.map(mail => ({
                                 ...mail,
                                 email: mail.employeeEmail,
-                                title: "title", // Replace with the actual title property
-                                message: "message", // Replace with the actual message property
+                                //title: "title", // Replace with the actual title property
+                                //message: "message", // Replace with the actual message property
                               }));
                               
                             setMails(receivedMails);
@@ -202,11 +202,17 @@ const HistoryMails = () => {
                 <TextField
                     label="Szukaj"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => {
+                        setSearchTerm(e.target.value)
+                        paginate(1); 
+                    }}
                 />
                 <Select
                     value={filterCriteria}
-                    onChange={(e) => setFilterCriteria(e.target.value)}
+                    onChange={(e) => {
+                        setFilterCriteria(e.target.value);
+                        paginate(1); 
+                    }}
                 >
                     <MenuItem value="all">All</MenuItem>
                     {uniqueCompanies.map((company) => (
@@ -246,7 +252,7 @@ const HistoryMails = () => {
                                         <TableCell>{mail.createdAt}</TableCell>
                                         <TableCell>{mail.title}</TableCell>
                                         <TableCell>
-                                            <Link to={`/profile/${mail.id}` /* backend nie przysyla id pracownika */}>
+                                            <Link to={`/profile/${mail.employeeId}` /* backend nie przysyla id pracownika */}>
                                                 {mail.email}
                                             </Link>
                                         </TableCell>
@@ -284,10 +290,10 @@ const HistoryMails = () => {
                                 Temat: {selectedMail.title}
                             </Typography>
                             <Typography style={{ margin: '0.5rem 0' }} variant="body1">
-                                Zawartość: {selectedMail.message}
+                                {selectedMail.message}
                             </Typography>
                             <Typography style={{ margin: '0.5rem 0' }} variant="body1">
-                                Pracownik: {recruiter.firstName} {recruiter.lastName} ({recruiter.email})
+                                Rekruter: {recruiter.firstName} {recruiter.lastName} ({recruiter.email})
                             </Typography>
                             <Button
                                 variant="outlined"

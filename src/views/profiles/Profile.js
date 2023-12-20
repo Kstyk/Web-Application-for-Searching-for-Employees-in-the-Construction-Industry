@@ -48,6 +48,8 @@ const Profile = () => {
 
   const [userData, setUserData] = useState();
 
+  const [awfulMapping, setAwfulMapping] = useState();  // used because backend api doesnt delete fav profile based on profileId, but on id
+
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -63,34 +65,39 @@ const Profile = () => {
     fetchUserProfile();
   }, []);
 
-  useEffect(() => {
-    const fetchProfiles = async () => {
-      if (isLoggedIn) {
-        try {
-          const token = localStorage.getItem('token');
+  const fetchProfiles = async () => {
+    if (isLoggedIn) {
+      try {
+        const token = localStorage.getItem('token');
 
-          const response = await api.get('/employees/saved-profiles', {
-            headers: {
-              Authorization: `${token}`,
-            },
+        const response = await api.get('/employees/saved-profiles', {
+          headers: {
+            Authorization: `${token}`,
+          },
+        });
+
+        if (Array.isArray(response.data) && response.data.length > 0) {
+          const profiles = response.data.map(profile => {
+            const { id, profileId } = profile;
+
+            return {
+              id,
+              profileId,
+            };
           });
 
-          if (Array.isArray(response.data) && response.data.length > 0) {
-            const profiles = response.data.map(profile => {
-              const { id } = profile;
+          setFavoriteProfiles(new Set(profiles.map(profile => profile.profileId)));
 
-              return {
-                id,
-              };
-            });
-
-            setFavoriteProfiles(new Set(profiles.map(profile => profile.id)));
-          }
-        } catch (error) {
-          console.error('Error fetching user profile:', error.message);
+          const idMap = new Map(profiles.map(profile => [profile.profileId, profile.id]));
+          setAwfulMapping(idMap);
         }
+      } catch (error) {
+        console.error('Error fetching user profile:', error.message);
       }
-    };
+    }
+  };
+
+  useEffect(() => {
     fetchProfiles();
   }, []);
 
@@ -99,11 +106,15 @@ const Profile = () => {
       try {
         const token = localStorage.getItem('token');
 
-        await api.delete(`/employees/${profileId}`, {
+        const deletionId = awfulMapping.get(profileId);
+
+        await api.delete(`/employees/${deletionId}`, {
           headers: {
             Authorization: `${token}`,
           },
         });
+
+        fetchProfiles();
 
       } catch (error) {
         console.error('Error deleting profile:', error.message);
@@ -123,6 +134,8 @@ const Profile = () => {
             Authorization: `${token}`,
           },
         });
+
+        fetchProfiles();
 
       } catch (error) {
         console.error('Error deleting profile:', error.message);
