@@ -52,11 +52,13 @@ namespace AI2_Backend
                
            
             CreateMap<InvitationHistory, InvitationDto>()
+                .ForMember(dest => dest.EmployeeId, opt => opt.MapFrom(src => src.Employee.Id))
                 .ForMember(dest => dest.EmployeeEmail, opt => opt.MapFrom(src => src.Employee.Email))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.DateOfSending.ToString("dd.MM.yyyy HH:mm")))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
 
             CreateMap<InvitationHistory, InvitationEmployeeDto>()
+              .ForMember(dest => dest.EmployeeId, opt => opt.MapFrom(src => src.Employee.Id))
               .ForMember(dest => dest.RecruiterEmail, opt => opt.MapFrom(src => src.Recruiter.Email))
               .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.DateOfSending.ToString("dd.MM.yyyy HH:mm")))
               .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));

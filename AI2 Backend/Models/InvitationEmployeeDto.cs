@@ -5,7 +5,7 @@ namespace AI2_Backend.Models
 {
     public class InvitationEmployeeDto
     {
-        
+            public int EmployeeId { get; set; }
             public string RecruiterEmail { get; set; }
             public string Company { get; set; }
             public string CreatedAt { get; set; }
