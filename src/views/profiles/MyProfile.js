@@ -10,7 +10,7 @@ import {
   IconButton,
   Typography,
   Modal,
-  Box
+  Box,
 } from '@mui/material';
 import { MailOutline, Edit, Delete } from '@mui/icons-material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -34,30 +34,29 @@ const Profile = () => {
   const [editingProfile, setEditingProfile] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (isLoggedIn) {
-        try {
-          const token = localStorage.getItem('token');
+  const fetchUserProfile = async () => {
+    if (isLoggedIn) {
+      try {
+        const token = localStorage.getItem('token');
 
-          const response = await api.get('/account/my-profile', {
-            headers: {
-              Authorization: `${token}`,
-            },
-          });
+        const response = await api.get('/account/my-profile', {
+          headers: {
+            Authorization: `${token}`,
+          },
+        });
 
-          const user = response.data;
+        const user = response.data;
 
-          setUserData(user);
-          console.log(user);
-
-        } catch (error) {
-          console.error('Error fetching user profile:', error.message);
-        }
+        setUserData(user);
+      } catch (error) {
+        console.error('Error fetching user profile:', error.message);
       }
-    };
+    }
+  };
+
+  useEffect(() => {
     fetchUserProfile();
-  }, [isLoggedIn]);
+  }, []);
 
   useEffect(() => {
     if (editingProfile) {
@@ -85,9 +84,7 @@ const Profile = () => {
   const lastDayLogins = 10;
   const lastMonthLogins = 100;
 
-  const handleAddToFavorites = () => {
-
-  };
+  const handleAddToFavorites = () => {};
 
   // const handleSendEmail = () => {
   // };
@@ -100,18 +97,18 @@ const Profile = () => {
   const handleConfirmDelete = async () => {
     const token = localStorage.getItem('token');
 
-    await api.delete('/account', {
-      headers: {
-        Authorization: `${token}`,
-      },
-    })
+    await api
+      .delete('/account', {
+        headers: {
+          Authorization: `${token}`,
+        },
+      })
       .then((res) => {
         logout();
         navigate('/dashboard');
       })
       .catch((err) => {
         console.error('Error fetching user profile:', err.message);
-
       });
   };
 
@@ -119,8 +116,7 @@ const Profile = () => {
     setDeleteModalOpen(false);
   };
 
-  const handleProfileEdited = (editedProfile) => {
-    setUserData(editedProfile);
+  const handleProfileEdited = () => {
     setSuccessMessage('Pomyślnie zaktualizowano profil');
   };
 
@@ -162,17 +158,24 @@ const Profile = () => {
           <Typography>Imię: {userData?.firstName}</Typography>
           <Typography>Nazwisko: {userData?.lastName}</Typography>
           <Typography>Email: {userData?.email}</Typography>
-          {userData?.requiredPayment && <Typography>Interesujące zarobki: {userData?.requiredPayment}</Typography>}
-          {userData?.userQualifications.length > 0 && <Typography>Specjalizacje: {userData?.userQualifications.map(qualification => qualification.name).join(', ')}</Typography>}
+          {userData?.requiredPayment && (
+            <Typography>Interesujące zarobki: {userData?.requiredPayment}</Typography>
+          )}
+          {userData?.userQualifications.length > 0 && (
+            <Typography>
+              Specjalizacje:{' '}
+              {userData?.userQualifications.map((qualification) => qualification.name).join(', ')}
+            </Typography>
+          )}
           {userData?.aboutMe && <Typography>Krótki opis: {userData?.aboutMe}</Typography>}
           {userData?.education && <Typography>Ukończona szkoła: {userData?.education}</Typography>}
 
-          {userData?.userExperiences.length > 0 &&
+          {userData?.userExperiences.length > 0 && (
             <div className="my-3">
               <Typography variant="subtitle1" gutterBottom>
                 Doświadczenie:
               </Typography>
-              {userData?.userExperiences.map(experience => (
+              {userData?.userExperiences.map((experience) => (
                 <ExperienceItem
                   key={experience?.id}
                   from={experience?.startYear}
@@ -182,7 +185,7 @@ const Profile = () => {
                 />
               ))}
             </div>
-          }
+          )}
 
           <Typography marginTop={3}>Statystyki odwiedzin profilu:</Typography>
           <ul>
@@ -192,12 +195,12 @@ const Profile = () => {
         </CardContent>
       </Card>
 
-
       {editingProfile && (
         <EditProfile
           profile={editingProfile}
           onClose={() => setEditingProfile(null)}
           onProfileEdited={handleProfileEdited}
+          fetchUserProfile={fetchUserProfile}
         />
       )}
       <Modal open={deleteModalOpen} onClose={handleCloseDeleteModal}>
@@ -206,11 +209,7 @@ const Profile = () => {
             Czy na pewno chcesz usunąć swój profil?
           </Typography>
           <div className="mt-4 flex justify-center space-x-4">
-            <Button
-              variant="contained"
-              color="info"
-              onClick={handleCloseDeleteModal}
-            >
+            <Button variant="contained" color="info" onClick={handleCloseDeleteModal}>
               Nie
             </Button>
             <Button color="red" variant="contained" onClick={handleConfirmDelete}>
