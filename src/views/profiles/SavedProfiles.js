@@ -35,6 +35,7 @@ const SavedProfiles = () => {
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [sortedProfiles, setSortedProfiles] = useState([]);
   const [filteredProfiles, setFilteredProfiles] = useState([]);
+  //const [totalItemsCount, setTotalItemsCount] = useState(0);
   const profilesPerPage = 10;
 
 /*{ id: 1, name: 'Doe John', occupation: ['Developer'], email: 'john@example.com' },
@@ -49,26 +50,28 @@ const SavedProfiles = () => {
                 const token = localStorage.getItem('token');
     
                 const response = await api.get('/employees/saved-profiles', {
-                headers: {
+                  headers: {
                     Authorization: `${token}`,
-                },
+                  },
                 });
     
                 if (Array.isArray(response.data) && response.data.length > 0) {
                   const profiles = response.data.map(profile => {
-                    const { id, employeeEmail, employeeFirstName, employeeLastName } = profile;
+                    const { id, profileId, employeeEmail, employeeFirstName, employeeLastName } = profile;
                     
                     return {
                       id,
+                      profileId,
                       email: employeeEmail,
                       firstName: employeeFirstName,
                       lastName: employeeLastName,
                       name: `${employeeFirstName} ${employeeLastName}`,
-                      occupation: ["zawód"],
+                      occupation: profile.qualifications,
                     };
                   });
         
                   setProfilesData(profiles);
+                  console.log(Math.ceil(profilesToDisplay.length));
                 }
             } catch (error) {
                 console.error('Error fetching user profile:', error.message);
@@ -76,12 +79,12 @@ const SavedProfiles = () => {
         }
     };
     fetchProfiles();
-  }, []); 
+  }, [currentPage]); 
 
   useEffect(() => {
     console.log(profilesData[0]);
     const filteredProfiles = Array.isArray(profilesData) ? profilesData.filter((profile) => {
-      if (filterCriteria === 'all' || profile.occupation.includes(filterCriteria)) {
+      if (filterCriteria === 'all' || profile.occupation.some((qualification) => qualification.name === filterCriteria)) {
         return (
           profile.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           profile.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -90,12 +93,13 @@ const SavedProfiles = () => {
       return false;
     }) : [];
 
+    setFilteredProfiles(filteredProfiles);
+
     const sortedProfiles = [...filteredProfiles].sort((a, b) => {
       const order = sortOrder === 'asc' ? 1 : -1;
       return order * a.name.localeCompare(b.name);
     });
 
-    setFilteredProfiles(filteredProfiles);
     setSortedProfiles(sortedProfiles);
   }, [profilesData, searchTerm, filterCriteria, sortOrder]);
 
@@ -104,7 +108,7 @@ const SavedProfiles = () => {
   const startIndex = (currentPage - 1) * profilesPerPage;
   const endIndex = startIndex + profilesPerPage;
 
-  const profilesToDisplay = sortedProfiles.slice(startIndex, endIndex);
+  const profilesToDisplay = sortedProfiles.slice(startIndex, endIndex); // profilesData;
 
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
@@ -124,33 +128,23 @@ const SavedProfiles = () => {
     setSelectedProfile(profile);
   };
 
-  /*const handleDeleteProfile = () => {
-    if (selectedProfile) {
-      // Usuń użytkownika z listy
-      setProfilesData((prevProfiles) =>
-        prevProfiles.filter((profile) => profile.id !== selectedProfile.id)
-      );
-      toggleFavorite(selectedProfile.id);
-      setSelectedProfile(null);
-    }
-  };*/
-
   const handleDeleteProfile = async () => {
+    console.log(selectedProfile);
     if (selectedProfile) {
       try {
         const token = localStorage.getItem('token');
   
-        await api.delete(`/employees/${selectedProfile.id}`, {
+        await api.delete(`/employees/${selectedProfile.id}`, {  // api wymaga wlasny rodzaj id, teoretycznie tu powinien byc profileId
           headers: {
             Authorization: `${token}`,
           },
         });
   
         setProfilesData((prevProfiles) =>
-          prevProfiles.filter((profile) => profile.id !== selectedProfile.id)
+          prevProfiles.filter((profile) => profile.profileId !== selectedProfile.profileId)
         );
   
-        toggleFavorite(selectedProfile.id);
+        toggleFavorite(selectedProfile.profileId);
         setSelectedProfile(null);
       } catch (error) {
         console.error('Error deleting profile:', error.message);
@@ -158,7 +152,9 @@ const SavedProfiles = () => {
     }
   };
 
-  const uniqueOccupations = [...new Set(profilesData.flatMap((profile) => profile.occupation))];
+  const uniqueOccupations = [...new Set(profilesData.flatMap((profile) => 
+    profile.occupation.map((qualification) => qualification.name)
+  ))];
 
   return (
     <div className="p-4">
@@ -167,11 +163,17 @@ const SavedProfiles = () => {
         <TextField
           label="Szukaj"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            setSearchTerm(e.target.value)
+            handlePageChange(null, 1); 
+          }}
         />
         <Select
           value={filterCriteria}
-          onChange={(e) => setFilterCriteria(e.target.value)}
+          onChange={(e) => {
+            setFilterCriteria(e.target.value);
+            handlePageChange(null, 1); 
+          }}
         >
           <MenuItem value="all">All</MenuItem>
             {
@@ -204,13 +206,17 @@ const SavedProfiles = () => {
           </TableHead>
           <TableBody>
             {profilesToDisplay.map((profile, index) => (
-              <TableRow key={profile.id}>
+              <TableRow key={profile.profileId}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{profile.name}</TableCell>
-                { <TableCell>{profile.occupation.join(', ')}</TableCell> }
+                <TableCell>
+                  {profile.occupation && profile.occupation.length > 0
+                    ? profile.occupation.map((occupation) => occupation.name).join(', ')
+                    : 'No occupations'}
+                </TableCell>
                 <TableCell>{profile.email}</TableCell>
                 <TableCell>
-                  <Link href={`/profile/${profile.id}`}>Zobacz profil</Link>
+                  <Link href={`/profile/${profile.profileId}`}>Zobacz profil</Link>
                 </TableCell>
                 <TableCell>
                   <Button
@@ -226,7 +232,7 @@ const SavedProfiles = () => {
         </Table>
       </TableContainer>
       <Pagination
-        count={Math.ceil(filteredProfiles.length / profilesPerPage)}
+        count={Math.ceil(sortedProfiles.length / profilesPerPage)}
         page={currentPage}
         onChange={handlePageChange}
         className="mt-4"

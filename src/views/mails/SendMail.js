@@ -26,11 +26,12 @@ const SendMail = () => {
     const navigate = useNavigate();
 
     const [showInfoBox, setShowInfoBox] = useState(false);
-    const { handleSubmit, control } = useForm();
+    const { control, handleSubmit, formState: { errors } } = useForm();
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
     const [senderId, setSenderId] = useState("");
-    const [ userId, setUserId ] = useState(5);// useParams();
+    const { id } = useParams();
+    const [ userId, setUserId ] = useState(id);
 
     console.log(userId);
 
@@ -70,12 +71,16 @@ const SendMail = () => {
             const response = await api.post('/invitation', formData, {
                 headers: {
                     Authorization: `${token}`,
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'multipart/form-data',
                 },
             });
 
-            if (response.ok) {
+            console.log(1);
+
+            if (response.status === 204 || response.status === 200) {
                 setShowInfoBox(true);
+
+                console.log(2);
 
                 setTimeout(() => {
                     navigate('/mail_history');
@@ -100,12 +105,15 @@ const SendMail = () => {
                             name="Company"
                             control={control}
                             defaultValue=""
+                            rules={{ required: 'Podaj firmę' }}    
                             render={({ field }) => (
                                 <TextField
                                     {...field}
-                                    label="Company"
+                                    label="Firma"
                                     variant="outlined"
                                     fullWidth
+                                    error={!!errors.Company}
+                                    helperText={errors.Company?.message}
                                 />
                             )}
                         />
@@ -115,12 +123,15 @@ const SendMail = () => {
                             name="Subject"
                             control={control}
                             defaultValue=""
+                            rules={{ required: 'Podaj temat' }}
                             render={({ field }) => (
                                 <TextField
                                     {...field}
-                                    label="Title"
+                                    label="Temat"
                                     variant="outlined"
                                     fullWidth
+                                    error={!!errors.Subject}
+                                    helperText={errors.Subject?.message}
                                 />
                             )}
                         />
@@ -130,14 +141,17 @@ const SendMail = () => {
                             name="Body"
                             control={control}
                             defaultValue=""
+                            rules={{ required: 'Podaj treść' }}
                             render={({ field }) => (
                                 <TextField
                                     {...field}
-                                    label="Message"
+                                    label="Treść"
                                     variant="outlined"
                                     multiline
                                     rows={4}
                                     fullWidth
+                                    error={!!errors.Body}
+                                    helperText={errors.Body?.message}
                                 />
                             )}
                         />
@@ -148,14 +162,15 @@ const SendMail = () => {
                             variant="contained"
                             color="primary"
                             endIcon={<SendIcon />}
+                            disabled={Object.keys(errors).length > 0}
                         >
                             Send
                         </Button>
                     </div>
                 </form>
                 {showInfoBox && (
-                    <div className="mt-3 p-2 bg-green-200 text-green-800 rounded">
-                        Mail sent successfully! Redirecting...
+                    <div className="mt-3 p-2 bg-green-200 text-green-800 rounded text-center">
+                        Pomyślnie wysłano wiadomość. Nastąpi przekierowanie.
                     </div>
                 )}
             </CardContent>
