@@ -220,8 +220,8 @@ const Profile = () => {
 
           <Typography marginTop={3}>Statystyki odwiedzin profilu:</Typography>
           <ul>
-            <li>Ostatni dzień: {lastDayLogins} razy</li>
-            <li>Ostatni miesiąc: {lastMonthLogins} razy</li>
+            <li>Ostatni dzień: {userData?.counterDaily} razy</li>
+            <li>Ostatni miesiąc: {userData?.counterMonthy} razy</li>
           </ul>
         </CardContent>
         <div className="flex justify-end p-4">
