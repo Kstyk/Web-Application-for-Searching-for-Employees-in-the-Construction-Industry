@@ -4,6 +4,7 @@ using AI2_Backend.Models;
 using AI2_Backend.Models.Queries;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace AI2_Backend.Services
@@ -105,7 +106,7 @@ namespace AI2_Backend.Services
             if (query.SearchText is not null)
             {
                 baseQuery = baseQuery
-                    .Where(r => (r.FirstName.Contains(query.SearchText) || r.LastName.Contains(query.SearchText)) && r.UserPreferences.IsVisibleProfile == true && r.UserPreferences.IsVisibleVoivodeship == true);
+                    .Where(r => (r.FirstName.Contains(query.SearchText) || r.LastName.Contains(query.SearchText)) || r.Email.Contains(query.SearchText) && r.UserPreferences.IsVisibleProfile == true && r.UserPreferences.IsVisibleVoivodeship == true);
             }
 
 
@@ -113,13 +114,31 @@ namespace AI2_Backend.Services
             var columnsSelectors = new Dictionary<string, Expression<Func<User, object>>> {
                     { nameof(User.RequiredPayment), r => r.RequiredPayment },
                     { nameof(User.FirstName), r => r.FirstName },
-                    { nameof(User.LastName), r => r.LastName }
+                    { nameof(User.LastName), r => r.LastName },
+                    { nameof(User.Email), r => r.Email },
+                    { nameof(User.Voivodeship), r => r.Voivodeship.Value },
                 };
 
             var selectedColumn = columnsSelectors[query.SortBy];
-            baseQuery = query.SortDirection == SortDirection.ASC ?
-                baseQuery.OrderBy(selectedColumn) :
-                baseQuery.OrderByDescending(selectedColumn);
+            if (query.SortBy == nameof(User.Voivodeship))
+            {
+                baseQuery = query.SortDirection == SortDirection.ASC ?
+                   baseQuery.Where(r => r.UserPreferences.IsVisibleVoivodeship).OrderBy(selectedColumn) :
+                   baseQuery.Where(r => r.UserPreferences.IsVisibleVoivodeship).OrderByDescending(selectedColumn);
+            }
+            else if (query.SortBy == nameof(User.RequiredPayment))
+            {
+                baseQuery = query.SortDirection == SortDirection.ASC ?
+                   baseQuery.Where(r => r.UserPreferences.IsVisibleRequiredPayment).OrderBy(selectedColumn) :
+                   baseQuery.Where(r => r.UserPreferences.IsVisibleRequiredPayment).OrderByDescending(selectedColumn);
+            }
+            else
+            {
+                // Normalne sortowanie dla innych kolumn
+                baseQuery = query.SortDirection == SortDirection.ASC ?
+                    baseQuery.OrderBy(selectedColumn) :
+                    baseQuery.OrderByDescending(selectedColumn);
+            }
 
             // paginacja
             var employees = baseQuery
