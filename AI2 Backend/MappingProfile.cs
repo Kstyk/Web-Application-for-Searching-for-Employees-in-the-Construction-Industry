@@ -36,7 +36,9 @@ namespace AI2_Backend
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Experience.Description));
             CreateMap<CreateExperienceDto, Experience>();
 
-            CreateMap<User, MyProfileDto>();
+            CreateMap<User, MyProfileDto>()
+                 .ForMember(dest => dest.CounterDaily, opt => opt.MapFrom(src => src.Stats.CounterDaily))
+                .ForMember(dest => dest.CounterMonthly, opt => opt.MapFrom(src => src.Stats.CounterMonthly));
             CreateMap<UserPreferences, UserPreferencesDto>();
             CreateMap<User, UserProfileDto>()
                 .ForMember(dest => dest.Voivodeship, opt => opt.Condition(src => src?.UserPreferences?.IsVisibleVoivodeship == true))
@@ -44,7 +46,9 @@ namespace AI2_Backend
                 .ForMember(dest => dest.Education, opt => opt.Condition(src => src?.UserPreferences?.IsVisibleEducation == true))
                 .ForMember(dest => dest.RequiredPayment, opt => opt.Condition(src => src?.UserPreferences?.IsVisibleRequiredPayment == true))
                 .ForMember(dest => dest.UserExperiences, opt => opt.Condition(src => src?.UserPreferences?.IsVisibleExperience == true))
-                .ForMember(dest => dest.UserQualifications, opt => opt.Condition(src => src?.UserPreferences?.IsVisibleSkills == true));
+                .ForMember(dest => dest.UserQualifications, opt => opt.Condition(src => src?.UserPreferences?.IsVisibleSkills == true))
+                .ForMember(dest => dest.CounterDaily, opt => opt.MapFrom(src => src.Stats.CounterDaily))
+                .ForMember(dest => dest.CounterMonthly, opt => opt.MapFrom(src => src.Stats.CounterMonthly));
 
             CreateMap<InvitationRequestDto, InvitationHistory>()
                 .ForMember(dest => dest.Message, opt => opt.MapFrom(src => src.Body))

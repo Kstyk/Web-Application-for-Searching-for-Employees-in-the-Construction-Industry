@@ -21,6 +21,49 @@ namespace AI2_Backend.Services
             _mapper = mapper;
             _userContextService = userContextService;
         }
+        public void ResetDailyCounters()
+        {
+            var today = DateTime.Today;
+
+            var statsList = _context.Stats
+                .Where(s => s.CounterDaily > 0 && s.LastDailyReset.Date < today)
+                .ToList();
+
+            foreach (var stats in statsList)
+            {
+                if (stats.Employee?.UserPreferences?.IsVisibleProfile != false)
+                {
+                    stats.CounterDaily = 1;
+                    stats.LastDailyReset = today;
+                    _context.Stats.Update(stats);
+                }
+            }
+
+            _context.SaveChanges();
+        }
+
+        public void ResetMonthlyCounters()
+        {
+            var today = DateTime.Today;
+
+            var statsList = _context.Stats
+                .Where(s => s.CounterMonthly > 0 && s.LastMonthlyReset.Month != today.Month)
+                .ToList();
+
+            foreach (var stats in statsList)
+            {
+                if (stats.Employee?.UserPreferences?.IsVisibleProfile != false)
+                {
+                    stats.CounterMonthly = 1;
+                    stats.LastMonthlyReset = today;
+                    _context.Stats.Update(stats);
+                }
+            }
+
+            _context.SaveChanges();
+        }
+
+
 
         public UserProfileDto GetEmployeeProfile(int employeeId)
         {
@@ -29,6 +72,7 @@ namespace AI2_Backend.Services
                 .Include(q => q.UserQualifications).ThenInclude(u => u.Qualification)
                 .Include(q => q.UserExperiences).ThenInclude(u => u.Experience)
                 .Include(q => q.UserPreferences)
+                .Include(q => q.Stats)
                 .FirstOrDefault(u => u.Id == employeeId);
 
             if (user != null)
@@ -38,31 +82,31 @@ namespace AI2_Backend.Services
                     return null;
                 }
 
-                var userProfile = _mapper.Map<UserProfileDto>(user);
 
                 var stats = _context.Stats
-                    .FirstOrDefault(u => u.Id == employeeId);
+                    .FirstOrDefault(u => u.EmployeeId == employeeId);
                 if (stats != null)
                 {
-                    userProfile.CounterDaily = stats.CounterDaily;
-                    userProfile.CounterMonthy = stats.CounterMonthly;
                     stats.CounterDaily++;
                     stats.CounterMonthly++;
                     _context.Stats.Update(stats);
                     _context.SaveChanges();
-
                 }
                 else
                 {
                     stats = new Stats();
+                    stats.LastDailyReset = DateTime.Today;
+                    stats.LastMonthlyReset = DateTime.Today;
                     stats.CounterMonthly = 1;
                     stats.CounterDaily = 1;
                     stats.EmployeeId = employeeId;
                     _context.Stats.Add(stats);
                     _context.SaveChanges();
-
                 }
+                ResetDailyCounters();
+                ResetMonthlyCounters();
 
+                var userProfile = _mapper.Map<UserProfileDto>(user);
 
                 return userProfile;
             }
@@ -77,6 +121,7 @@ namespace AI2_Backend.Services
                 .Include(q => q.UserQualifications).ThenInclude(u => u.Qualification)
                 .Include(q => q.UserExperiences).ThenInclude(u => u.Experience)
                 .Include(q => q.UserPreferences)
+                .Include(q => q.Stats)
                 .Where(r => r.Role.Name == "employee" && r.UserPreferences.IsVisibleProfile == true);
 
             // filtrowanie
