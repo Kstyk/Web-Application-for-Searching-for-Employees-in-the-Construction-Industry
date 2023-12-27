@@ -140,6 +140,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IQualificationService, QualificationService>();
 builder.Services.AddScoped<IInvitationSevice, InvitationService>();
+builder.Services.AddScoped<IStatService, StatService>();
 
 // validators
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();

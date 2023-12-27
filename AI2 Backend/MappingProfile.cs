@@ -74,7 +74,12 @@ namespace AI2_Backend
                   .ForMember(dest => dest.ProfileId, opt => opt.MapFrom(src => src.Employee.Id))
                  .ForMember(dest => dest.Qualifications, opt => opt.MapFrom(src => src.Employee.UserQualifications));
 
-       
+            CreateMap<Qualification, QualificationStatDto>()
+               .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+               .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+               .ForMember(dest => dest.CandidatesNum, opt => opt.MapFrom(src => src.UserQualifications.Count));
+
+
             CreateMap<UpdateUserPreferencesDto, UserPreferences>();
 
 
