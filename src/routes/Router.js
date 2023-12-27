@@ -18,6 +18,7 @@ const SavedProfiles = Loadable(lazy(() => import('../views/profiles/SavedProfile
 // const EditProfile = Loadable(lazy(() => import('../views/profiles/EditProfile')));
 const SendMail = Loadable(lazy(() => import('../views/mails/SendMail')));
 const HistoryMails = Loadable(lazy(() => import('../views/mails/HistoryMails')));
+const Stat = Loadable(lazy(() => import('../views/stats/Stat')));
 
 const Router = [
   {
@@ -35,6 +36,7 @@ const Router = [
       //{ path: '/edit_profile/:id', exact: true, element: <EditProfile /> },
       { path: '/mail_send/:id', exact: true, element: <SendMail /> },
       { path: '/mail_history', exact: true, element: <HistoryMails /> },
+      { path: '/stat', exact: true, element: <Stat /> },
       { path: '*', element: <Navigate to="/auth/404" /> },
     ],
   },
