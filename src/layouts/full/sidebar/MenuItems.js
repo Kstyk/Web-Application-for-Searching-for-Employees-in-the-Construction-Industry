@@ -1,5 +1,5 @@
 import {
-  IconLayoutDashboard, IconLogin, IconUserPlus, IconSearch
+  IconLayoutDashboard, IconLogin, IconUserPlus, IconSearch, IconAlbum
 } from '@tabler/icons';
 
 import { uniqueId } from 'lodash';
@@ -23,6 +23,13 @@ var items = [
     title: 'Szukanie profili',
     icon: IconSearch,
     href: '/profiles',
+  },
+
+  {
+    id: uniqueId(),
+    title: 'Statystyka',
+    icon: IconAlbum,
+    href: '/stat',
   },
 
   {
