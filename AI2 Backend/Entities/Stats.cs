@@ -7,5 +7,7 @@
         public virtual User? Employee { get; set; }
         public int CounterDaily { get; set; } = 0;
         public int CounterMonthly { get; set; } = 0;
+        public DateTime LastDailyReset { get; set; }
+        public DateTime LastMonthlyReset { get; set; }
     }
 }

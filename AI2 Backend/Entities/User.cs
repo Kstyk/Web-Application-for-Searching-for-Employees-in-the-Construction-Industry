@@ -20,7 +20,7 @@ namespace AI2_Backend.Entities
         public ICollection<SavedProfile> SavedProfiles { get; set; } = new List<SavedProfile>();
         public ICollection<InvitationHistory> InvitationsHistory { get; set; } = new List<InvitationHistory>();
         public virtual UserPreferences? UserPreferences { get; set; }
-
+        public Stats? Stats { get; set; }
 
 
     }
