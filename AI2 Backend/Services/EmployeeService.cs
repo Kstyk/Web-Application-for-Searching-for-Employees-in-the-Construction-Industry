@@ -85,28 +85,34 @@ namespace AI2_Backend.Services
 
                 var stats = _context.Stats
                     .FirstOrDefault(u => u.EmployeeId == employeeId);
-                if (stats != null)
-                {
-                    stats.CounterDaily++;
-                    stats.CounterMonthly++;
-                    _context.Stats.Update(stats);
-                    _context.SaveChanges();
-                }
-                else
-                {
-                    stats = new Stats();
-                    stats.LastDailyReset = DateTime.Today;
-                    stats.LastMonthlyReset = DateTime.Today;
-                    stats.CounterMonthly = 1;
-                    stats.CounterDaily = 1;
-                    stats.EmployeeId = employeeId;
-                    _context.Stats.Add(stats);
-                    _context.SaveChanges();
-                }
+               
+
                 ResetDailyCounters();
                 ResetMonthlyCounters();
 
                 var userProfile = _mapper.Map<UserProfileDto>(user);
+
+                if (stats != null)   // Statystyka
+                {
+                    if (stats.LastUpdateDate.Date == DateTime.Now.Date)
+                    {
+                        userProfile.CounterDaily = stats.CounterDaily;
+                    }
+                    else
+                    {
+                        userProfile.CounterDaily = 0;
+                    }
+                    if (stats.LastUpdateDate.Year == DateTime.Now.Year
+                        && stats.LastUpdateDate.Month == DateTime.Now.Month)
+                    {
+                        userProfile.CounterMonthly = stats.CounterMonthly;
+                    }
+                    else
+                    {
+                        userProfile.CounterMonthly = 0;
+                    }
+                    userProfile.CounterAll = stats.CounterAll;
+                }
 
                 return userProfile;
             }

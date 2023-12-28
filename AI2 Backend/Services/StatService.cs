@@ -66,11 +66,24 @@ namespace AI2_Backend.Services
         public bool UpdateVisitsStat(int employeeId)
         {
             var stats = _context.Stats
-                     .FirstOrDefault(u => u.Id == employeeId);
+                     .FirstOrDefault(u => u.EmployeeId == employeeId);
             if (stats != null)
             {
-                stats.CounterDaily++;
-                stats.CounterMonthly++;
+                if (stats.LastUpdateDate.Date == DateTime.Now.Date)
+                {
+                    stats.CounterDaily++;
+                }
+                else
+                    stats.CounterDaily = 1;
+                if (stats.LastUpdateDate.Year == DateTime.Now.Year
+                    && stats.LastUpdateDate.Month == DateTime.Now.Month)
+                {
+                    stats.CounterMonthly++;
+                }
+                else
+                    stats.CounterMonthly = 1;
+                stats.CounterAll++;
+                stats.LastUpdateDate = DateTime.Now;
                 _context.Stats.Update(stats);
                 _context.SaveChanges();
 
@@ -80,6 +93,8 @@ namespace AI2_Backend.Services
                 stats = new Stats();
                 stats.CounterMonthly = 1;
                 stats.CounterDaily = 1;
+                stats.CounterAll = 1;
+                stats.LastUpdateDate = DateTime.Now;
                 stats.EmployeeId = employeeId;
                 _context.Stats.Add(stats);
                 _context.SaveChanges();
@@ -94,5 +109,7 @@ namespace AI2_Backend.Services
             return true;
 
         }
+
+
     }
 }

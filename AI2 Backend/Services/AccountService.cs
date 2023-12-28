@@ -50,6 +50,7 @@ namespace AI2_Backend.Services
                     Employee = newUser
                 };
 
+                userStats.LastUpdateDate = DateTime.Now;
                 _context.Stats.Add(userStats);
             }
 
@@ -167,7 +168,30 @@ namespace AI2_Backend.Services
                 .Include(q => q.Stats)
                 .FirstOrDefault(u => u.Id == userId));
 
-          
+            var stats = _context.Stats
+                    .FirstOrDefault(u => u.EmployeeId == userId);
+
+            if (stats != null)   // Statystyka
+            {
+                if (stats.LastUpdateDate.Date == DateTime.Now.Date)
+                {
+                    userProfile.CounterDaily = stats.CounterDaily;
+                }
+                else
+                {
+                    userProfile.CounterDaily = 0;
+                }
+                if (stats.LastUpdateDate.Year == DateTime.Now.Year
+                    && stats.LastUpdateDate.Month == DateTime.Now.Month)
+                {
+                    userProfile.CounterMonthly = stats.CounterMonthly;
+                }
+                else
+                {
+                    userProfile.CounterMonthly = 0;
+                }
+                userProfile.CounterAll = stats.CounterAll;
+            }
 
             return userProfile;
         }

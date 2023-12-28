@@ -9,5 +9,7 @@
         public int CounterMonthly { get; set; } = 0;
         public DateTime LastDailyReset { get; set; }
         public DateTime LastMonthlyReset { get; set; }
+        public int CounterAll { get; set; } = 0;
+        public DateTime LastUpdateDate { get; set; } 
     }
 }
