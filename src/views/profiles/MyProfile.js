@@ -190,7 +190,8 @@ const Profile = () => {
           <Typography marginTop={3}>Statystyki odwiedzin profilu:</Typography>
           <ul>
             <li>Ostatni dzień: {userData?.counterDaily} razy</li>
-            <li>Ostatni miesiąc: {userData?.counterMonthy} razy</li>
+            <li>Ostatni miesiąc: {userData?.counterMonthly} razy</li>
+            <li>Wszystkie: {userData?.counterAll} razy</li>
           </ul>
         </CardContent>
       </Card>
