@@ -63,6 +63,7 @@ const Profile = () => {
       }
     };
     fetchUserProfile();
+    handleUpdateVisitsStat(id);
   }, []);
 
   const fetchProfiles = async () => {
@@ -121,6 +122,26 @@ const Profile = () => {
       }
     }
   };
+
+  const handleUpdateVisitsStat = async (profileId) => {
+    if (profileId) {
+        try {
+            console.log("Update Visits Stat for Employee ID: " + profileId)
+            const token = localStorage.getItem('token');
+
+            await api.post(`/stat/update-visits-stat/${profileId}`, {
+                employeeId: profileId,
+            }, {
+                headers: {
+                    Authorization: `${token}`,
+                },
+            });
+
+        } catch (error) {
+            console.error('Error updating visits statistics:', error.message);
+        }
+    }
+};
 
   const handleAddToFavorites = async (profileId) => {
     if (profileId) {
@@ -221,7 +242,8 @@ const Profile = () => {
           <Typography marginTop={3}>Statystyki odwiedzin profilu:</Typography>
           <ul>
             <li>Ostatni dzień: {userData?.counterDaily} razy</li>
-            <li>Ostatni miesiąc: {userData?.counterMonthy} razy</li>
+            <li>Ostatni miesiąc: {userData?.counterMonthly} razy</li>
+            <li>Wszystkie: {userData?.counterAll} razy</li>
           </ul>
         </CardContent>
         <div className="flex justify-end p-4">
