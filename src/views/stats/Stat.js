@@ -96,7 +96,7 @@ const Stat = () => {
                     color="primary"
                     onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
                 >
-                    {`Sortuj ${sortOrder === 'asc' ? 'rosnaco' : 'malejaco'}`}
+                    {`Sortuj ${sortOrder === 'asc' ? 'malejaco' : 'rosnaco'}`}
                 </Button>
             </div>
             <TableContainer component={Paper}>
