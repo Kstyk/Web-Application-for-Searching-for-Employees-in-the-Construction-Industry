@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import axios from 'axios';
@@ -12,8 +12,15 @@ const api = axios.create({
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token") || '');
   const [isLoggedIn, setLoggedIn] = useState(!!token);
+  const [userRole, setUserRole] = useState(null);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchUserRole();
+    }
+  }, [isLoggedIn]);
 
   const login = async (credentials) => {
     try {
@@ -52,8 +59,29 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const fetchUserRole = async () => {
+    if (isLoggedIn) {
+      try {
+        const token = localStorage.getItem('token');
+
+        const response = await api.get('/account/my-profile', {
+          headers: {
+            Authorization: `${token}`,
+          },
+        });
+
+        const user = response.data;
+
+        setUserRole(user.roleId);
+
+      } catch (error) {
+        console.error('Error fetching user profile:', error.message);
+      }
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout, register }}>
+    <AuthContext.Provider value={{ isLoggedIn, login, logout, register, userRole }}>
       {children}
     </AuthContext.Provider>
   );

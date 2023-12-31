@@ -19,6 +19,7 @@ import Pagination from '@mui/lab/Pagination';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { filter } from 'lodash';
+import { useAuth } from '../../contexts/AuthContext';
 
 const api = axios.create({
   baseURL: 'http://localhost:5072/api',
@@ -40,28 +41,30 @@ const Profiles = () => {
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [awfulMapping, setAwfulMapping] = useState();  // used because backend api doesnt delete fav profile based on profileId, but on id
 
+  const { userRole } = useAuth();
+
   const fetchProfiles = async () => {
     try {
       const token = localStorage.getItem('token');
-  
+
       const response = await api.get('/employees/saved-profiles', {
         headers: {
           Authorization: `${token}`,
         },
       });
-  
+
       if (Array.isArray(response.data) && response.data.length > 0) {
         const profiles = response.data.map(profile => {
           const { id, profileId } = profile;
-  
+
           return {
             id,
             profileId,
           };
         });
-  
+
         setFavoriteProfiles(new Set(profiles.map(profile => profile.profileId)));
-  
+
         const idMap = new Map(profiles.map(profile => [profile.profileId, profile.id]));
         setAwfulMapping(new Map(idMap));
       }
@@ -73,7 +76,7 @@ const Profiles = () => {
   useEffect(() => {
     fetchProfiles();
   }, []);
-  
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -107,8 +110,8 @@ const Profiles = () => {
         console.error('Error fetching data from the backend:', error);
       }
     };
-  
-    fetchData(); 
+
+    fetchData();
   }, [currentPage, searchTerm, sortOrder, filterCriteria]);
 
   const toggleFavorite = (profileId) => {
@@ -152,17 +155,17 @@ const Profiles = () => {
     if (profileId) {
       try {
         const token = localStorage.getItem('token');
-  
+
         await api.delete(`/employees/${awfulMapping.get(profileId)}`, {
           headers: {
             Authorization: `${token}`,
           },
-        });  
-  
+        });
+
         setProfilesData((prevProfiles) =>
           prevProfiles.filter((profile) => profile.profileId !== profileId)
         );
-  
+
         //toggleFavorite(profileId);
         //setSelectedProfile(null);
         fetchProfiles();
@@ -188,7 +191,7 @@ const Profiles = () => {
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value)
-            handlePageChange(null, 1); 
+            handlePageChange(null, 1);
           }}
         />
         <Autocomplete
@@ -196,7 +199,7 @@ const Profiles = () => {
           value={filterCriteria}
           onChange={(e, newValue) => {
             setFilterCriteria(newValue ? newValue.id : null);
-            handlePageChange(null, 1); 
+            handlePageChange(null, 1);
           }}
           options={qualifications}
           getOptionLabel={(option) => option.name}
@@ -222,45 +225,49 @@ const Profiles = () => {
               <TableCell>Kwalifikacje</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>Link profilu</TableCell>
-              <TableCell>Ulubione</TableCell>
+              {userRole == 1 &&
+                <TableCell>Ulubione</TableCell>
+              }
             </TableRow>
           </TableHead>
           <TableBody>
             {profilesData && profilesData.length > 0 ? (
-            profilesData.map((profile, index) => (
-              <TableRow key={index + 1}>
-                <TableCell>{index + 1}</TableCell>
-                <TableCell>{`${profile.firstName} ${profile.lastName}`}</TableCell>
-                <TableCell>
-                  {profile.userQualifications && profile.userQualifications.length > 0 ? (
-                    <ul>
-                      {profile.userQualifications.map((qualification) => (
-                        <li key={qualification.id}>{qualification.name}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    ' brak '
-                  )}
-
-                </TableCell>
-                <TableCell>{profile.email}</TableCell>
-                <TableCell>
-                  <Link href={`/profile/${profile.id}`}>Zobacz profil</Link>
-                </TableCell>
-                <TableCell>
-                  <Button
-                    color='grey2'
-                    onClick={() => toggleFavorite(profile.id)}
-                  >
-                    {isFavorite(profile.id) ? (
-                      <FavoriteIcon className="text-gray-600" />
+              profilesData.map((profile, index) => (
+                <TableRow key={index + 1}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{`${profile.firstName} ${profile.lastName}`}</TableCell>
+                  <TableCell>
+                    {profile.userQualifications && profile.userQualifications.length > 0 ? (
+                      <ul>
+                        {profile.userQualifications.map((qualification) => (
+                          <li key={qualification.id}>{qualification.name}</li>
+                        ))}
+                      </ul>
                     ) : (
-                      <FavoriteBorderIcon className="text-gray-600" />
+                      ' brak '
                     )}
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))
+
+                  </TableCell>
+                  <TableCell>{profile.email}</TableCell>
+                  <TableCell>
+                    <Link href={`/profile/${profile.id}`}>Zobacz profil</Link>
+                  </TableCell>
+                  {userRole == 1 &&
+                    <TableCell>
+                      <Button
+                        color='grey2'
+                        onClick={() => toggleFavorite(profile.id)}
+                      >
+                        {isFavorite(profile.id) ? (
+                          <FavoriteIcon className="text-gray-600" />
+                        ) : (
+                          <FavoriteBorderIcon className="text-gray-600" />
+                        )}
+                      </Button>
+                    </TableCell>
+                  }
+                </TableRow>
+              ))
             ) : (
               <TableRow>
                 <TableCell colSpan={6}>No profiles found.</TableCell>

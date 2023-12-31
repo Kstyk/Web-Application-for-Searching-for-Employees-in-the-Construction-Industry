@@ -26,25 +26,12 @@ const api = axios.create({
 });
 
 const Profile = () => {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, userRole } = useAuth();
 
   const { id } = useParams();
   const navigate = useNavigate();
   const [favoriteProfiles, setFavoriteProfiles] = useState(new Set());
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-
-  // Przykładowe dane użytkownika
-  /*const userData = {
-    id: 2,
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'johndoe@example.com',
-    province: 'Mazowieckie',
-    earnings: '60,000 PLN',
-    specialties: ['Hydraulik', 'Tynkarz'],
-    shortInfo: 'Jestem doświadczonym hydraulikiem i tynkarzem.',
-    school: 'Politechnika Warszawska',
-  };*/
 
   const [userData, setUserData] = useState();
 
@@ -125,23 +112,23 @@ const Profile = () => {
 
   const handleUpdateVisitsStat = async (profileId) => {
     if (profileId) {
-        try {
-            console.log("Update Visits Stat for Employee ID: " + profileId)
-            const token = localStorage.getItem('token');
+      try {
+        console.log("Update Visits Stat for Employee ID: " + profileId)
+        const token = localStorage.getItem('token');
 
-            await api.post(`/stat/update-visits-stat/${profileId}`, {
-                employeeId: profileId,
-            }, {
-                headers: {
-                    Authorization: `${token}`,
-                },
-            });
+        await api.post(`/stat/update-visits-stat/${profileId}`, {
+          employeeId: profileId,
+        }, {
+          headers: {
+            Authorization: `${token}`,
+          },
+        });
 
-        } catch (error) {
-            console.error('Error updating visits statistics:', error.message);
-        }
+      } catch (error) {
+        console.error('Error updating visits statistics:', error.message);
+      }
     }
-};
+  };
 
   const handleAddToFavorites = async (profileId) => {
     if (profileId) {
@@ -199,14 +186,16 @@ const Profile = () => {
           subheader={userData?.voivodeship ? `Województwo: ${userData?.voivodeship}` : ''}
           action={
             <div>
-              <Button color='grey2'
-                onClick={() => toggleFavorite(userData?.id)}>
-                {isFavorite(userData?.id) ? (
-                  <FavoriteIcon className="text-gray-600" />
-                ) : (
-                  <FavoriteBorderIcon className="text-gray-600" />
-                )}
-              </Button>
+              {userRole == 1 &&
+                <Button color='grey2'
+                  onClick={() => toggleFavorite(userData?.id)}>
+                  {isFavorite(userData?.id) ? (
+                    <FavoriteIcon className="text-gray-600" />
+                  ) : (
+                    <FavoriteBorderIcon className="text-gray-600" />
+                  )}
+                </Button>
+              }
             </div>
           }
         />
@@ -247,7 +236,7 @@ const Profile = () => {
           </ul>
         </CardContent>
         <div className="flex justify-end p-4">
-          <Link to={`/mail_send/${id}`}>
+          <Link to={`/mail-send/${id}`}>
             <Button
               startIcon={<MailOutline />}
               onClick={handleSendEmail}
