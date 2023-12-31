@@ -23,33 +23,7 @@ const api = axios.create({
 });
 
 const Profile = () => {
-  const { isLoggedIn, logout } = useAuth();
-  const [userData, setUserData] = useState();
-
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (isLoggedIn) {
-        try {
-          const token = localStorage.getItem('token');
-
-          const response = await api.get('/account/my-profile', {
-            headers: {
-              Authorization: `${token}`,
-            },
-          });
-
-          const user = response.data;
-
-          setUserData(user);
-          console.log(user.roleId);
-
-        } catch (error) {
-          console.error('Error fetching user profile:', error.message);
-        }
-      }
-    };
-    fetchUserProfile();
-  }, [isLoggedIn]);
+  const { isLoggedIn, logout, userRole } = useAuth();
 
   const handleLogout = (e) => {
     e.preventDefault();
@@ -112,21 +86,21 @@ const Profile = () => {
           },
         }}
       >
-        <MenuItem component={Link} to={`/my_profile`}>
+        <MenuItem component={Link} to={`/my-profile`}>
           <ListItemIcon>
             <IconUser width={20} />
           </ListItemIcon>
           <ListItemText>Mój profil</ListItemText>
         </MenuItem>
-        {userData?.roleId == 1 &&
-          <MenuItem component={Link} to="/saved_profiles">
+        {userRole == 1 &&
+          <MenuItem component={Link} to="/saved-profiles">
             <ListItemIcon>
               <IconMail width={20} />
             </ListItemIcon>
             <ListItemText>Zapisane profile</ListItemText>
           </MenuItem>
         }
-        <MenuItem component={Link} to="/mail_history">
+        <MenuItem component={Link} to="/mail-history">
           <ListItemIcon>
             <IconListCheck width={20} />
           </ListItemIcon>
