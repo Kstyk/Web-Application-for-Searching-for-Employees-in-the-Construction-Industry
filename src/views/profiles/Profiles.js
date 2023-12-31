@@ -11,9 +11,12 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
+  Slider,
   Paper,
   Link,
   Autocomplete,
+  Typography
 } from '@mui/material';
 import Pagination from '@mui/lab/Pagination';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -28,11 +31,18 @@ const api = axios.create({
 const Profiles = () => {
   const [profilesData, setProfilesData] = useState([]);
   const [favoriteProfiles, setFavoriteProfiles] = useState(new Set());
-  const [qualifications, setQualifications] = useState([]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
-  const [filterCriteria, setFilterCriteria] = useState();
+  const [sortBy, setSortBy] = useState();
+  const [paymentRange, setPaymentRange] = useState([0, 100000]);
+  const [maxPayment, setMaxPayment] = useState(100000);
+  const [sliderChanged, setSliderChanged] = useState(0);
+
+  const [qualificationId, setQualificationId] = useState();
+  const [qualifications, setQualifications] = useState([]);
+  const [voivodeship, setVoivodeship] = useState();
+  const [voivodeships, setVoivodeships] = useState([]);
 
   const profilesPerPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
@@ -75,6 +85,16 @@ const Profiles = () => {
 
   useEffect(() => {
     fetchProfiles();
+
+    const fetchMaxPayment = async () => {
+      const profilesResponse = await api.get('/employees', {});
+      
+      // Find max salary
+      const maxRequiredPayment = Math.max(...profilesResponse.data.items.map(profile => profile.requiredPayment));
+      setMaxPayment(maxRequiredPayment);
+    };
+
+    fetchMaxPayment();
   }, []);
 
 
@@ -85,17 +105,19 @@ const Profiles = () => {
         const qualificationsResponse = await api.get('/qualifications', {});
         setQualifications(qualificationsResponse.data);
 
-        console.log(filterCriteria);
-
         // Fetch user profiles
         const profilesResponse = await api.get('/employees', {
           params: {
             itemsFrom: (currentPage - 1) * profilesPerPage + 1,
             itemsTo: currentPage * profilesPerPage,
             pageNumber: currentPage,
+            sortBy: sortBy,
             sortDirection: sortOrder,
             searchText: searchTerm,
-            qualificationId: filterCriteria
+            minimumPayment: paymentRange[0],
+            maximumPayment: paymentRange[1],
+            voivodeship: voivodeship,
+            qualificationId: qualificationId,
           },
         });
         if (Array.isArray(profilesResponse.data.items)) {
@@ -103,6 +125,16 @@ const Profiles = () => {
 
           setTotalItemsCount(profilesResponse.data.totalItemsCount);
           console.log(totalItemsCount);
+
+          // Gather unique voivodeships
+          const uniqueVoivodeships = new Set();
+
+          profilesResponse.data.items.forEach((profile) => {
+            uniqueVoivodeships.add(profile.voivodeship);
+          });
+
+          const voivodeshipsArray = Array.from(uniqueVoivodeships);
+          setVoivodeships(voivodeshipsArray);
         } else {
           console.error('Invalid user data:', profilesResponse.data.items);
         }
@@ -112,7 +144,17 @@ const Profiles = () => {
     };
 
     fetchData();
-  }, [currentPage, searchTerm, sortOrder, filterCriteria]);
+
+  }, [currentPage, searchTerm, sortBy, sortOrder, voivodeship, qualificationId, sliderChanged]);
+
+  /*useEffect(() => {
+    const gatherVoivodeships = async () => {
+      
+    }
+    gatherVoivodeships();
+    console.log(voivodeships.length);
+  }, [profilesData]);*/
+
 
   const toggleFavorite = (profileId) => {
     const newFavoriteProfiles = new Set(favoriteProfiles);
@@ -184,7 +226,7 @@ const Profiles = () => {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-semibold mb-4">Profile pracowników</h1>
-      <div className="flex space-x-2 mb-4">
+      <div className="flex justify-between space-x-2 mb-4">
         <TextField
           className="w-1/4"
           label="Szukaj"
@@ -196,9 +238,9 @@ const Profiles = () => {
         />
         <Autocomplete
           className="w-1/4"
-          value={filterCriteria}
+          value={qualificationId}
           onChange={(e, newValue) => {
-            setFilterCriteria(newValue ? newValue.id : null);
+            setQualificationId(newValue ? newValue.id : null);
             handlePageChange(null, 1);
           }}
           options={qualifications}
@@ -206,6 +248,18 @@ const Profiles = () => {
           getOptionValue={(option) => option.id}
           renderInput={(params) => (
             <TextField {...params} label="Wybierz kwalifikację" />
+          )}
+        />
+        <Autocomplete
+          className="w-1/4"
+          value={voivodeship}
+          onChange={(e, newValue) => {
+            setVoivodeship(newValue);
+            handlePageChange(null, 1);
+          }}
+          options={voivodeships}
+          renderInput={(params) => (
+            <TextField {...params} label="Wybierz województwo" />
           )}
         />
         <Button
@@ -216,14 +270,89 @@ const Profiles = () => {
           {`Sortuj ${sortOrder === 'asc' ? 'rosnąco' : 'malejąco'}`}
         </Button>
       </div>
+      <div className="flex space-x-2 mb-4">
+        <Typography id="payment-range-slider" gutterBottom>
+          Przedział Zarobków
+        </Typography>
+        <Slider
+          value={paymentRange}
+          onChange={(event, newValue) => setPaymentRange(newValue)}
+          onChangeCommitted={(event, newValue) => setSliderChanged(newValue)}
+          valueLabelDisplay="auto"
+          valueLabelFormat={(value) => `${value} zł`}
+          max={maxPayment}
+          min={0}
+          aria-labelledby="earnings-range-slider"
+        />
+      </div>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell>LP</TableCell>
-              <TableCell>Pracownik</TableCell>
+              <TableCell>
+              <TableSortLabel
+                  active={sortBy === 'LastName'}
+                  direction={sortBy === 'LastName' ? sortOrder : 'asc'}
+                  onClick={() => {
+                    if (sortBy === "LastName") {
+                      if (sortOrder === 'asc') setSortOrder('desc');
+                      if (sortOrder === 'desc') setSortOrder('asc');
+                    }
+                    else setSortOrder('asc');
+                    setSortBy('LastName');
+                  }}
+                >
+                  Pracownik
+                </TableSortLabel>
+              </TableCell>
               <TableCell>Kwalifikacje</TableCell>
-              <TableCell>Email</TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={sortBy === 'Email'}
+                  direction={sortBy === 'Email' ? sortOrder : 'asc'}
+                  onClick={() => {
+                    if (sortBy === "Email") {
+                      if (sortOrder === 'asc') setSortOrder('desc');
+                      if (sortOrder === 'desc') setSortOrder('asc');
+                    }
+                    else setSortOrder('asc');
+                    setSortBy('Email');
+                  }}
+                >
+                  Email
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={sortBy === 'RequiredPayment'}
+                  direction={sortBy === 'RequiredPayment' ? sortOrder : 'asc'}
+                  onClick={() => {
+                    if (sortBy === "RequiredPayment") {
+                      if (sortOrder === 'asc') setSortOrder('desc');
+                      if (sortOrder === 'desc') setSortOrder('asc');
+                    }
+                    setSortBy('RequiredPayment');
+                  }}
+                >
+                  Preferowane Zarobki
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={sortBy === 'Voivodeship'}
+                  direction={sortBy === 'Voivodeship' ? sortOrder : 'asc'}
+                  onClick={() => {
+                    if (sortBy === "Voivodeship") {
+                      if (sortOrder === 'asc') setSortOrder('desc');
+                      if (sortOrder === 'desc') setSortOrder('asc');
+                    }
+                    setSortBy('Voivodeship');
+                  }}
+                >
+                  Województwo
+                </TableSortLabel>
+              </TableCell>
               <TableCell>Link profilu</TableCell>
               {userRole == 1 &&
                 <TableCell>Ulubione</TableCell>
@@ -249,6 +378,8 @@ const Profiles = () => {
 
                   </TableCell>
                   <TableCell>{profile.email}</TableCell>
+                  <TableCell>{profile.requiredPayment}</TableCell>
+                  <TableCell>{profile.voivodeship}</TableCell>
                   <TableCell>
                     <Link href={`/profile/${profile.id}`}>Zobacz profil</Link>
                   </TableCell>
