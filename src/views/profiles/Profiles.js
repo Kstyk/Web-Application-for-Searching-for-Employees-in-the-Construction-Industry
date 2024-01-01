@@ -42,7 +42,24 @@ const Profiles = () => {
   const [qualificationId, setQualificationId] = useState();
   const [qualifications, setQualifications] = useState([]);
   const [voivodeship, setVoivodeship] = useState();
-  const [voivodeships, setVoivodeships] = useState([]);
+  const [voivodeships, setVoivodeships] = useState([
+    'dolnośląskie',
+    'kujawskoPomorskie',
+    'lubelskie',
+    'lubuskie',
+    'łódzkie',
+    'małopolskie',
+    'mazowieckie',
+    'opolskie',
+    'podkarpackie',
+    'podlaskie',
+    'pomorskie',
+    'śląskie',
+    'świętokrzyskie',
+    'warmińskoMazurskie',
+    'wielkopolskie',
+    'zachodnioPomorskie',
+  ]);
 
   const profilesPerPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
@@ -86,15 +103,15 @@ const Profiles = () => {
   useEffect(() => {
     fetchProfiles();
 
-    const fetchMaxPayment = async () => {
-      const profilesResponse = await api.get('/employees', {});
+    //const fetchMaxPayment = async () => {
+    //  const profilesResponse = await api.get('/employees', {});
       
       // Find max salary
-      const maxRequiredPayment = Math.max(...profilesResponse.data.items.map(profile => profile.requiredPayment));
-      setMaxPayment(maxRequiredPayment);
-    };
+    //  const maxRequiredPayment = Math.max(...profilesResponse.data.items.map(profile => profile.requiredPayment));
+    //  setMaxPayment(maxRequiredPayment);
+    //};
 
-    fetchMaxPayment();
+    //fetchMaxPayment();
   }, []);
 
 
@@ -127,14 +144,14 @@ const Profiles = () => {
           console.log(totalItemsCount);
 
           // Gather unique voivodeships
-          const uniqueVoivodeships = new Set();
+          //const uniqueVoivodeships = new Set();
 
-          profilesResponse.data.items.forEach((profile) => {
-            uniqueVoivodeships.add(profile.voivodeship);
-          });
+          //profilesResponse.data.items.forEach((profile) => {
+          //  uniqueVoivodeships.add(profile.voivodeship);
+          //});
 
-          const voivodeshipsArray = Array.from(uniqueVoivodeships);
-          setVoivodeships(voivodeshipsArray);
+          //const voivodeshipsArray = Array.from(uniqueVoivodeships);
+          //setVoivodeships(voivodeshipsArray);
         } else {
           console.error('Invalid user data:', profilesResponse.data.items);
         }
@@ -208,9 +225,10 @@ const Profiles = () => {
           prevProfiles.filter((profile) => profile.profileId !== profileId)
         );
 
+        fetchProfiles();
+
         //toggleFavorite(profileId);
         //setSelectedProfile(null);
-        fetchProfiles();
       } catch (error) {
         console.error('Error deleting profile:', error.message);
       }
@@ -280,7 +298,7 @@ const Profiles = () => {
           onChangeCommitted={(event, newValue) => setSliderChanged(newValue)}
           valueLabelDisplay="auto"
           valueLabelFormat={(value) => `${value} zł`}
-          max={maxPayment}
+          max={100000}
           min={0}
           aria-labelledby="earnings-range-slider"
         />
